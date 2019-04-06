@@ -2,6 +2,7 @@
 
 import sys
 import re
+import pickle
 
 
 # Saves a greeting for use later
@@ -55,7 +56,8 @@ def main():
 				else:
 					print("Ooops--that one didn't register.  Try entering it again!")
 
-	getactivities()
+	pickle.dump(getactivities(), open("savefile.py", "wb"))
+
 
 	print(expdict)
 	print(activitydict)
