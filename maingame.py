@@ -22,11 +22,15 @@ def main():
 
 	def getactivities():
 		activity = input("")
+		count = 0
 		for category in activitydict.keys():
 			if activity in activitydict[category]:
+				count += 1
 				print("You've done that one before!")
-				print("It's worth {0} exp!".format(activitydict[category][activity]))
-		if activity not in activitydict.keys():
+				current = activitydict[category][activity]
+				print("{0} experience points have been added to {1}!".format(current, category))
+				expdict[category] += current
+		if count == 0:
 			print("That's a new one--how many experience points is it worth?  (Give a number between 1 and 50!)")
 			activityexp = int(input(""))
 			activitydict[activity.lower()] = activityexp
