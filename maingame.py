@@ -21,12 +21,19 @@ def getactivities():
 		print("It's worth {0} exp!".format(activitydict[activity]))
 	else:
 		print("That's a new one--how many experience points is it worth?  (Give a number between 1 and 50!)")
-		activityexp = input("")
+		activityexp = int(input(""))
 		activitydict[activity.lower()] = activityexp
 		for category in expdict.keys():
 			print(category.title())
-		print("To which category should I assign that exp?  You can assign it to any of the above categories:\n")
-		catchoice = input("")
+		while True:
+			print("To which category should I assign that exp?  You can assign it to any of the above categories:\n")
+			catchoice = input("")
+			if catchoice.lower() in expdict.keys():
+				expdict[catchoice] += activityexp
+				print("{0} exp added to {1}!".format(activityexp, catchoice))
+				break
+			else:
+				print("Ooops--that one didn't register.  Try entering it again!")
 
 getactivities()
 
