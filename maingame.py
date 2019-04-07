@@ -47,9 +47,22 @@ def main(player):
 				print("There are no saved files--starting a new game!")
 				newplayer = Player()
 				return newplayer
+
+	def choosenext(player):
+		print("What would you like to do next?  You can choose from any of these:")
+		for key in player.optionlist.keys():
+			print(key.title())
+		usrinput = input("")
+		for option in player.optionlist.keys():
+			if (usrinput.lower() in option):
+				player.optionlist[option]()
+
+
+
 	
 	begingame()
-	player.opener()
+	choosenext(player)
+	#player.opener()
 
 
 

@@ -34,9 +34,11 @@ class Player(Actor):
 		# Aggregates experience by category
 		self.expdict = {"fitness" : 0, "intellect" : 0, "naturalism": 0, "happiness" : 0}
 
+		# Creates list of all options for a player to choose
 		self.optionlist = {
-			"new game" : self.getactivities,
-			"quit" : self.quitsave,
+			"add new activities" : self.getactivities,
+			"play the game" : "You can't quite do that yet!",
+			"quit game" : self.quitsave
 		}
 
 	def opener(self):
@@ -56,8 +58,8 @@ class Player(Actor):
 					i += 1
 					break
 
-	
 
+	#Prompts the player to save the game and either writes to a new file or overwrites an existing file
 	def quitsave(self, namedfile="newgame1"):
 			choice = input("Are you sure you want to quit? ")
 			if "y" in choice:
@@ -83,6 +85,7 @@ class Player(Actor):
 	def getactivities(self):
 		fullbreak = False
 		while True:
+			print(self.expdict)
 			greeting = print("What did you do, today?")
 			activity = input("")
 			count = 0
@@ -112,14 +115,16 @@ class Player(Actor):
 						print(category.title())
 
 					# Assigns a category to the activity for future use
-					print("To which category should I assign that exp?  You can assign it to any of the above categories:\n")
-					catchoice = input("")
-					catchoice = catchoice.lower()
-					if catchoice in self.expdict.keys():
-						self.expdict[catchoice] += activityexpint
-						print("{0} exp added to {1}!".format(activityexp, catchoice))
-					else:
-						print("Ooops--that one didn't register.  Try entering it again!")
+					while True:
+						print("To which category should I assign that exp?  You can assign it to any of the above categories:\n")
+						catchoice = input("")
+						catchoice = catchoice.lower()
+						if catchoice in self.expdict.keys():
+							self.expdict[catchoice] += activityexpint
+							print("{0} exp added to {1}!".format(activityexp, catchoice))
+							break
+						else:
+							print("Ooops--that one didn't register.  Try entering it again!")
 				print("All done with your activities for the day?")
 				endinput = input("")
 			
