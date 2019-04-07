@@ -70,7 +70,7 @@ def main(player):
 
 
 	optionlist = {
-	"new game" : getactivities,
+	"new game" : player.getactivities,
 	"quit" : player.quitsave,
 	}
 
@@ -79,7 +79,7 @@ def main(player):
 		print("Hi, and welcome!")
 		while True:
 			print("What would you like to do first? (You can choose from these things: ")
-			for key in optionlist.keys():
+			for key in player.optionlist.keys():
 				print(key.title())
 			
 			newinput = input("")

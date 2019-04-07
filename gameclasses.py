@@ -25,6 +25,20 @@ class Actor(livingThing):
 		self.safe = True
 
 class Player(Actor):
+	def __init__(self, name = "Unknown"):
+		self.name = name
+		
+		# Links categories and related activities
+		self.activitydict = {"fitness" : {"walk" : 5, "run" : 10}, "intellect" : {}, "intellect" : {}, "happiness" : {}}
+
+		# Aggregates experience by category
+		self.expdict = {"fitness" : 0, "intellect" : 0, "naturalism": 0, "happiness" : 0}
+
+		self.optionlist = {
+			"new game" : self.getactivities,
+			"quit" : self.quitsave,
+		}
+
 	def quitsave(self, namedfile="newgame1"):
 			choice = input("Are you sure you want to quit? ")
 			if "y" in choice:
@@ -47,7 +61,49 @@ class Player(Actor):
 			else:
 				pass
 
-	def __init__(self):
-		super().__init__(name = "Unknown Player")
+	def getactivities(self):
+		greeting = print("What did you do, today?")
+		activity = input("")
+		count = 0
+		
+		# Determines whether or not the activity has been done before
+		for category in self.activitydict.keys():
+			if activity in self.activitydict[category]:
+				count += 1
+				print("You've done that one before!")
+				current = self.activitydict[category][activity]
+				print("{0} experience points have been added to {1}!".format(current, category))
+				self.expdict[category] += current
+		
+		# Indicates that the activity hasn't been done before
+		if count == 0:
+			while True:
+				
+				# Assigns a quantity of experience points to your activity
+				print("That's a new one--how many experience points is it worth?  (Give a number between 1 and 50!)")
+				activityexp = input("")
+				try:
+				    activityexpint = int(activityexp)
+				    break
+				except ValueError:
+				    print("Could not convert data to an integer.")
+				self.activitydict[activity.lower()] = activityexp
+			for category in self.expdict.keys():
+				print(category.title())
+			while True:
+
+				# Assigns a category to the activity for future use
+				print("To which category should I assign that exp?  You can assign it to any of the above categories:\n")
+				catchoice = input("")
+				catchoice = catchoice.lower()
+				if catchoice in self.expdict.keys():
+					self.expdict[catchoice] += activityexpint
+					print("{0} exp added to {1}!".format(activityexp, catchoice))
+					break
+				else:
+					print("Ooops--that one didn't register.  Try entering it again!")
+
+
+	
 
 		
