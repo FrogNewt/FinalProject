@@ -9,13 +9,13 @@ from gameclasses import Player
 
 
 
+#newplayer = Player()
+
+
+
+
+
 newplayer = Player()
-
-
-
-
-
-
 
 
 def main(player):
@@ -60,8 +60,7 @@ def main(player):
 
 
 	
-	begingame()
-	choosenext(player)
+	choosenext(begingame())
 	#player.opener()
 
 

@@ -41,25 +41,43 @@ class Player(Actor):
 			"quit game" : self.quitsave
 		}
 
-	def opener(self):
-		print("Hi, and welcome!")
-		i = 0
-		while i==0:
-			print("What would you like to do first? (You can choose from these things: ")
-			for key in self.optionlist.keys():
-				print(key.title())
-			
-			newinput = input("")
-			newinput = newinput.lower()
-
-			for thing in self.optionlist.keys():
-				if newinput in thing:
-					self.optionlist[thing]()
-					i += 1
-					break
+	#  Now-defunct mechanism for beginning the game
+	#def opener(self):
+	#	print("Hi, and welcome!")
+	#	i = 0
+	#	while i==0:
+	#		print("What would you like to do first? (You can choose from these things: ")
+	#		for key in self.optionlist.keys():
+	#			print(key.title())
+	#		
+	#		newinput = input("")
+	#		newinput = newinput.lower()
+	#
+	#		for thing in self.optionlist.keys():
+	#			if newinput in thing:
+	#				self.optionlist[thing]()
+	#				i += 1
+	#				break
 
 
 	#Prompts the player to save the game and either writes to a new file or overwrites an existing file
+	
+	def save(self, namedfile="newgame1"):
+		save = input("Save game? (y/n)\n")
+		if "y" in save:
+			print("Choose a filename! (Default is '{0}') ".format(namedfile))
+			userinput = input("")
+			if not userinput:
+				with open(namedfile+'.pickle', 'wb') as handle:
+					pickle.dump(self, handle)
+					print("Game Saved to default!")
+			elif userinput:	
+				with open(userinput+'.pickle', 'wb') as handle:
+					pickle.dump(self, handle)
+					print("Game Saved!")
+		else:
+			print("Game not saved!")
+
 	def quitsave(self, namedfile="newgame1"):
 			choice = input("Are you sure you want to quit? ")
 			if "y" in choice:
@@ -82,6 +100,7 @@ class Player(Actor):
 			else:
 				pass
 
+	# Main method for gaining experience in the game; varies (or will vary) between flexible and fixed modes
 	def getactivities(self):
 		fullbreak = False
 		while True:
@@ -125,12 +144,20 @@ class Player(Actor):
 							break
 						else:
 							print("Ooops--that one didn't register.  Try entering it again!")
+				
+				# Checks to see if the user wants to add more activities before moving on to the next choice
 				print("All done with your activities for the day?")
 				endinput = input("")
 			
 				if ("y" in endinput):
 					fullbreak = True
+
+					# Prompts user to save the game
+					self.save()
+
 					break
+				
+				# Returns to original question about activities (what did you do, today?)
 				else:
 					break
 
