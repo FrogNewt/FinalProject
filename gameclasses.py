@@ -39,6 +39,21 @@ class Player(Actor):
 			"quit" : self.quitsave,
 		}
 
+	def opener(self):
+		print("Hi, and welcome!")
+		while True:
+			print("What would you like to do first? (You can choose from these things: ")
+			for key in self.optionlist.keys():
+				print(key.title())
+			
+			newinput = input("")
+			newinput = newinput.lower()
+
+			for i in self.optionlist.keys():
+				if newinput in i:
+					self.optionlist[i]()
+					break
+
 	def quitsave(self, namedfile="newgame1"):
 			choice = input("Are you sure you want to quit? ")
 			if "y" in choice:
@@ -102,6 +117,12 @@ class Player(Actor):
 					break
 				else:
 					print("Ooops--that one didn't register.  Try entering it again!")
+				print("All done with your activities for the day?")
+				endinput = input("")
+				if ("y" in endinput):
+					break
+				else:
+					pass
 
 
 	

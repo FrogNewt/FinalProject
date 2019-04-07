@@ -3,7 +3,7 @@
 import sys
 import re
 import pickle
-import activityengine
+#import activityengine
 from gameclasses import Player
 
 
@@ -13,7 +13,7 @@ newplayer = Player()
 
 
 def main(player):
-	activityengine.main(player)
+	player.opener()
 
 
 
