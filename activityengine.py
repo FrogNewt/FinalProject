@@ -3,6 +3,7 @@
 import sys
 import re
 import pickle
+import quitgame
 
 
 # Saves a greeting for use later
@@ -22,6 +23,16 @@ def main():
 
 	# Aggregates experience by category
 	expdict = {"fitness" : 0, "intellect" : 0, "naturalism": 0, "happiness" : 0}
+
+	optionlist = {
+	"New Game" : getactivities(),
+	"Quit Game" : quitsave(),
+	}
+
+	print("Hi, and welcome!  What would you like to do first? (You can do these things: ")
+
+	newinput = input("")
+
 
 	def getactivities():
 		greeting = print("What did you do, today?")
@@ -64,11 +75,7 @@ def main():
 				else:
 					print("Ooops--that one didn't register.  Try entering it again!")
 
-	pickle.dump(getactivities(), open("savefile.py", "wb"))
 
-
-	print(expdict)
-	print(activitydict)
 
 if __name__ == "__main__":
 	main()
