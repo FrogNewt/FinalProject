@@ -41,7 +41,8 @@ class Player(Actor):
 
 	def opener(self):
 		print("Hi, and welcome!")
-		while True:
+		i = 0
+		while i==0:
 			print("What would you like to do first? (You can choose from these things: ")
 			for key in self.optionlist.keys():
 				print(key.title())
@@ -49,10 +50,13 @@ class Player(Actor):
 			newinput = input("")
 			newinput = newinput.lower()
 
-			for i in self.optionlist.keys():
-				if newinput in i:
-					self.optionlist[i]()
+			for thing in self.optionlist.keys():
+				if newinput in thing:
+					self.optionlist[thing]()
+					i += 1
 					break
+
+	
 
 	def quitsave(self, namedfile="newgame1"):
 			choice = input("Are you sure you want to quit? ")
@@ -77,52 +81,61 @@ class Player(Actor):
 				pass
 
 	def getactivities(self):
-		greeting = print("What did you do, today?")
-		activity = input("")
-		count = 0
-		
-		# Determines whether or not the activity has been done before
-		for category in self.activitydict.keys():
-			if activity in self.activitydict[category]:
-				count += 1
-				print("You've done that one before!")
-				current = self.activitydict[category][activity]
-				print("{0} experience points have been added to {1}!".format(current, category))
-				self.expdict[category] += current
-		
-		# Indicates that the activity hasn't been done before
-		if count == 0:
+		fullbreak = False
+		while True:
+			greeting = print("What did you do, today?")
+			activity = input("")
+			count = 0
+			
+			# Determines whether or not the activity has been done before
 			while True:
+				for category in self.activitydict.keys():
+					if activity in self.activitydict[category]:
+						count += 1
+						print("You've done that one before!")
+						current = self.activitydict[category][activity]
+						print("{0} experience points have been added to {1}!".format(current, category))
+						self.expdict[category] += current
+						break
 				
-				# Assigns a quantity of experience points to your activity
-				print("That's a new one--how many experience points is it worth?  (Give a number between 1 and 50!)")
-				activityexp = input("")
-				try:
-				    activityexpint = int(activityexp)
-				    break
-				except ValueError:
-				    print("Could not convert data to an integer.")
-				self.activitydict[activity.lower()] = activityexp
-			for category in self.expdict.keys():
-				print(category.title())
-			while True:
+				# Indicates that the activity hasn't been done before
+				if count == 0:
+					# Assigns a quantity of experience points to your activity
+					print("That's a new one--how many experience points is it worth?  (Give a number between 1 and 50!)")
+					activityexp = input("")
+					try:
+					    activityexpint = int(activityexp)
+					except ValueError:
+					    print("Could not convert data to an integer.")
+					self.activitydict[activity.lower()] = activityexp
+					for category in self.expdict.keys():
+						print(category.title())
 
-				# Assigns a category to the activity for future use
-				print("To which category should I assign that exp?  You can assign it to any of the above categories:\n")
-				catchoice = input("")
-				catchoice = catchoice.lower()
-				if catchoice in self.expdict.keys():
-					self.expdict[catchoice] += activityexpint
-					print("{0} exp added to {1}!".format(activityexp, catchoice))
-					break
-				else:
-					print("Ooops--that one didn't register.  Try entering it again!")
+					# Assigns a category to the activity for future use
+					print("To which category should I assign that exp?  You can assign it to any of the above categories:\n")
+					catchoice = input("")
+					catchoice = catchoice.lower()
+					if catchoice in self.expdict.keys():
+						self.expdict[catchoice] += activityexpint
+						print("{0} exp added to {1}!".format(activityexp, catchoice))
+					else:
+						print("Ooops--that one didn't register.  Try entering it again!")
 				print("All done with your activities for the day?")
 				endinput = input("")
+			
 				if ("y" in endinput):
+					fullbreak = True
 					break
 				else:
-					pass
+					break
+
+			if fullbreak == True:
+				break
+
+
+
+
+
 
 
 	
