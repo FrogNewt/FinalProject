@@ -3,7 +3,7 @@
 import sys
 import re
 import pickle
-import quitgame
+
 
 
 # Saves a greeting for use later
@@ -16,7 +16,7 @@ import quitgame
 #activitydict = {"walk" : 5}
 
 
-def main():
+def main(player):
 
 	# Links categories and related activities
 	activitydict = {"fitness" : {"walk" : 5, "run" : 10}, "intellect" : {}, "intellect" : {}, "happiness" : {}}
@@ -24,14 +24,6 @@ def main():
 	# Aggregates experience by category
 	expdict = {"fitness" : 0, "intellect" : 0, "naturalism": 0, "happiness" : 0}
 
-	optionlist = {
-	"New Game" : getactivities(),
-	"Quit Game" : quitsave(),
-	}
-
-	print("Hi, and welcome!  What would you like to do first? (You can do these things: ")
-
-	newinput = input("")
 
 
 	def getactivities():
@@ -68,12 +60,38 @@ def main():
 				# Assigns a category to the activity for future use
 				print("To which category should I assign that exp?  You can assign it to any of the above categories:\n")
 				catchoice = input("")
-				if catchoice.lower() in expdict.keys():
+				catchoice = catchoice.lower()
+				if catchoice in expdict.keys():
 					expdict[catchoice] += activityexpint
 					print("{0} exp added to {1}!".format(activityexp, catchoice))
 					break
 				else:
 					print("Ooops--that one didn't register.  Try entering it again!")
+
+
+	optionlist = {
+	"new game" : getactivities,
+	"quit" : player.quitsave,
+	}
+
+	# Gives the user the initial choice of starting a new game or quitting
+	def opener():
+		print("Hi, and welcome!")
+		while True:
+			print("What would you like to do first? (You can choose from these things: ")
+			for key in optionlist.keys():
+				print(key.title())
+			
+			newinput = input("")
+			newinput = newinput.lower()
+
+			for i in optionlist.keys():
+				if newinput in i:
+					optionlist[i]()
+					break
+
+
+	opener()
 
 
 
