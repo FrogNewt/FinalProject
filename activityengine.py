@@ -18,15 +18,17 @@ import pickle
 def main():
 
 	# Links categories and related activities
-	activitydict = {"wellness" : {"walk" : 5, "run" : 10}, "professional" : {}, "social" : {}, "academics" : {}}
+	activitydict = {"fitness" : {"walk" : 5, "run" : 10}, "intellect" : {}, "intellect" : {}, "happiness" : {}}
 
 	# Aggregates experience by category
-	expdict = {"wellness" : 0, "academics" : 0, "social": 0, "professional" : 0}
+	expdict = {"fitness" : 0, "intellect" : 0, "naturalism": 0, "happiness" : 0}
 
 	def getactivities():
-		greeting = print("WELCOME TO--*ahem*--welcome to the game. What did you do, today?")
+		greeting = print("What did you do, today?")
 		activity = input("")
 		count = 0
+		
+		# Determines whether or not the activity has been done before
 		for category in activitydict.keys():
 			if activity in activitydict[category]:
 				count += 1
@@ -34,8 +36,12 @@ def main():
 				current = activitydict[category][activity]
 				print("{0} experience points have been added to {1}!".format(current, category))
 				expdict[category] += current
+		
+		# Indicates that the activity hasn't been done before
 		if count == 0:
 			while True:
+				
+				# Assigns a quantity of experience points to your activity
 				print("That's a new one--how many experience points is it worth?  (Give a number between 1 and 50!)")
 				activityexp = input("")
 				try:
@@ -47,6 +53,8 @@ def main():
 			for category in expdict.keys():
 				print(category.title())
 			while True:
+
+				# Assigns a category to the activity for future use
 				print("To which category should I assign that exp?  You can assign it to any of the above categories:\n")
 				catchoice = input("")
 				if catchoice.lower() in expdict.keys():
