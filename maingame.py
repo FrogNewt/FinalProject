@@ -49,13 +49,14 @@ def main(player):
 				return newplayer
 
 	def choosenext(player):
-		print("What would you like to do next?  You can choose from any of these:")
-		for key in player.optionlist.keys():
-			print(key.title())
-		usrinput = input("")
-		for option in player.optionlist.keys():
-			if (usrinput.lower() in option):
-				player.optionlist[option]()
+		while True:
+			print("What would you like to do next?  You can choose from any of these:")
+			for key in player.optionlist.keys():
+				print(key.title())
+			usrinput = input("")
+			for option in player.optionlist.keys():
+				if (usrinput.lower() in option):
+					player.optionlist[option]()
 
 
 
