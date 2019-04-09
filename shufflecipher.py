@@ -77,6 +77,7 @@ with open('scientificnames.txt', 'r') as file_stream:
 		org_name = line.strip()
 		org_name = org_name.replace('[', '')
 		org_name = org_name.replace(']', '')
+		org_name = org_name.replace(' sp.', '')
 		m = compiledclean.match(org_name)
 		# You could also use if !m: effectively
 		if m is None:
