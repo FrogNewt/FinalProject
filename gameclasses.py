@@ -11,7 +11,7 @@ class gameObject(object):
 
 
 class livingThing(gameObject):
-	def __init__(self, name, HP = 0):
+	def __init__(self, name="Living Thing", HP = 0):
 		self.name = name
 		self.HP = HP
 		self.alive = True

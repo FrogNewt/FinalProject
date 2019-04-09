@@ -6,6 +6,9 @@ import os
 import pickle
 #import activityengine
 from gameclasses import Player
+from shufflecipher import *
+
+
 
 
 
