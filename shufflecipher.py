@@ -58,6 +58,7 @@ def intercipher(organism):
 			interorg += interdict[i]
 		else:
 			interorg += i
+	interorg = interorg.capitalize()
 	return interorg
 
 
@@ -89,7 +90,7 @@ with open('scientificnames.txt', 'r') as file_stream:
 
 orglist = sorted(orglist)
 
-interorglist = [intercipher(thing) for thing in orglist]
+interorglist = [intercipher(organism) for organism in orglist]
 
 print(interorglist)
 
