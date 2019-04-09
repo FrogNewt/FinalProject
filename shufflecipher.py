@@ -40,6 +40,9 @@ def megacipher(organism):
 	for i in organism.lower():
 		if i in megadict.keys():
 			megaorg += megadict[i]
+		else:
+			megaorg += i
+	megaorg = megaorg.capitalize()
 	return megaorg
 
 
@@ -91,9 +94,17 @@ with open('scientificnames.txt', 'r') as file_stream:
 
 orglist = sorted(orglist)
 
+# Shuffles all newly-cleaned organisms in orglist
+
+# By megacipher
+megaorglist = [megacipher(organism) for organism in orglist]
+
+
+
+# By intercipher
 interorglist = [intercipher(organism) for organism in orglist]
 
-print(interorglist)
+#print(interorglist)
 
 #print(orglist)
 
