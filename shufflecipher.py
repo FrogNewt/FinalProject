@@ -89,8 +89,9 @@ with open('scientificnames.txt', 'r') as file_stream:
 
 orglist = sorted(orglist)
 
+interorglist = [intercipher(thing) for thing in orglist]
 
-
+print(interorglist)
 
 #print(orglist)
 
