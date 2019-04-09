@@ -8,17 +8,21 @@ from shufflecipher import *
 
 
 truemaster = set()
+typeslist = []
 with open ('eukaryotes.txt', 'r') as file_stream:
 	for line in file_stream:
+		# Note: Column 5 in Eukaryotes contains the "type" (Linnaean Class) of organism
+		typeslist.append(line.split('\t')[5])
 		org_line = line.strip()
 		org_line = org_line.replace('[', '')
 		org_line = org_line.replace(']', '')
 		m = compiledclean.match(org_line)
 		# You could also use if !m: effectively
 		if m is None:
-			truemaster.add(org_name)
+			truemaster.add(org_line)
 
-print(truemaster)
+
+[print(line.split('\t')[5]) for line in truemaster]
 
 
 class Animal(livingThing):
