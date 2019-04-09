@@ -70,14 +70,18 @@ def intercipher(organism):
 # Note that sets only add things that are new!
 orglist = set()
 
-cleanup = r"^[a-z].*$"
+cleanup = r"^[A-Z]*$"
 
 compiledclean = re.compile(cleanup)
 
 
+#temporglist = []
 with open('scientificnames.txt', 'r') as file_stream:
 	for line in file_stream:
-		org_name = line.strip()
+		org_line = line.strip()
+		org_name = org_line.split('\t')[0]
+		#org_type = org_line.split('\t')[5]
+		#temporglist.append(org_name)
 		org_name = org_name.replace('[', '')
 		org_name = org_name.replace(']', '')
 		org_name = org_name.replace(' sp.', '')
@@ -94,11 +98,14 @@ with open('scientificnames.txt', 'r') as file_stream:
 
 orglist = sorted(orglist)
 
+print(orglist)
+
+
 # Shuffles all newly-cleaned organisms in orglist
 
 # By megacipher
 megaorglist = [megacipher(organism) for organism in orglist]
-
+#print(megaorglist)
 
 
 # By intercipher
