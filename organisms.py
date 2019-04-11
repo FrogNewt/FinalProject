@@ -16,7 +16,7 @@ typeslist = []
 
 orglist = set()
 
-cleanup = r"^[A-Z]*$"
+cleanup = r"^[A-Z].+$"
 
 compiledclean = re.compile(cleanup)
 
@@ -33,8 +33,10 @@ with open('scientificnames.txt', 'r') as file_stream:
 		org_name = org_name.replace(' sp.', '')
 		m = compiledclean.match(org_name)
 		# You could also use if !m: effectively
-		if m is None:
+		if m:
+			#print(line)
 			orglist.add(org_name)
+			
 
 # Reads the fifth column in a tab-delimited line
 #[print(line.split('\t')[5]) for line in truemaster]
@@ -43,12 +45,26 @@ with open('scientificnames.txt', 'r') as file_stream:
 class Animal(livingThing):
 	def __init__(self):
 		super().__init__()
+		self.truename = ""
 		self.type = ""
 
 class Reptile(Animal):
 	def __init__(self):
 		super().__init__()
-		self.therm="ecto"
+		self.therm = "ecto"
+		self.type = "Game Reptile"
+
+class Amphibian(Animal):
+	def __init__(self):
+		super().__init__()
+		self.therm = "ecto"
+		self.type = "Game Amphibian"
+
+class Bird(Animal):
+	def __init__(self):
+		super().__init__()
+		self.therm = "endo"
+		self.type = "Game Bird"
 
 newanimal = Reptile()
 
@@ -60,6 +76,7 @@ def populatemaster(masterlist):
 	for element in masterlist:
 		organism = Animal()
 		organism.name = element
+		organism.truename = organism.name
 		popmaster.append(organism)
 
 	#[print(element.name) for element in popmaster]
@@ -88,8 +105,52 @@ with open ('eukaryotes.txt', 'r') as file_stream:
 		#if m is None:
 			#truemaster.add(org_line)
 
-for organism in popmaster:
-	print(organism.name, organism.type)
+
+
+
+#for organism in popmaster:
+#	print(organism.truename, organism.type)
+
+popready = []
+
+def givetype(poplist):
+	typedict = {
+	"Reptile" : Reptile(),
+	"Amphibian" : Amphibian(),
+	"Bird" : Bird()
+	}
+	
+
+	templist = []
+	
+	for organism in poplist:
+		for key in typedict.keys():
+			if key.lower() in organism.type.lower():
+				tempname = organism.name
+				organism = typedict[key]
+				organism.name = "done"
+				if organism.name not in templist:
+					popready.append(organism)
+					templist.append(organism.name)
+					
+
+
+				
+
+
+				
+				#print(organism.name, organism.type)
+
+
+
+givetype(popmaster)
+
+
+#[print(organism.name, organism.type) for organism in popready]
+[print(organism.name, organism.type) for organism in popready]
+#[print(organism.type) for organism in popmaster]
+
+
 #populatemaster(megaorglist)
 
 

@@ -70,7 +70,7 @@ def intercipher(organism):
 # Note that sets only add things that are new!
 orglist = set()
 
-cleanup = r"^[A-Z]*$"
+cleanup = r"^[A-Z].*$"
 
 compiledclean = re.compile(cleanup)
 
@@ -87,7 +87,8 @@ with open('scientificnames.txt', 'r') as file_stream:
 		org_name = org_name.replace(' sp.', '')
 		m = compiledclean.match(org_name)
 		# You could also use if !m: effectively
-		if m is None:
+		if m:
+			#print(line)
 			orglist.add(org_name)
 
 
