@@ -47,6 +47,7 @@ class Animal(livingThing):
 		super().__init__()
 		self.truename = ""
 		self.type = ""
+		self.listready = False
 
 class Reptile(Animal):
 	def __init__(self):
@@ -65,6 +66,12 @@ class Bird(Animal):
 		super().__init__()
 		self.therm = "endo"
 		self.type = "Game Bird"
+
+class Mammal(Animal):
+	def __init__(self):
+		super().__init__()
+		self.therm = "endo"
+		self.type = "Game Mammal"
 
 newanimal = Reptile()
 
@@ -115,23 +122,29 @@ popready = []
 
 def givetype(poplist):
 	typedict = {
-	"Reptile" : Reptile(),
-	"Amphibian" : Amphibian(),
-	"Bird" : Bird()
+	"Reptiles" : Reptile(),
+	"Amphibians" : Amphibian(),
+	"Birds" : Bird(),
+	"Mammals" : Mammal()
 	}
 	
 
 	templist = []
-	
+	tempname = ""
+
 	for organism in poplist:
 		for key in typedict.keys():
-			if key.lower() in organism.type.lower():
+			if key==organism.type:
 				tempname = organism.name
 				organism = typedict[key]
-				organism.name = "done"
-				if organism.name not in templist:
-					popready.append(organism)
-					templist.append(organism.name)
+				organism.name = tempname
+				print(organism.name, organism.type)
+
+			
+
+
+
+
 					
 
 
