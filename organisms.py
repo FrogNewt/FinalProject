@@ -3,6 +3,7 @@
 import sys
 import re
 import pickle
+#from gameclasses import livingThing
 
 #from shufflecipher import *
 
@@ -41,6 +42,18 @@ with open('scientificnames.txt', 'r') as file_stream:
 # Reads the fifth column in a tab-delimited line
 #[print(line.split('\t')[5]) for line in truemaster]
 
+class gameObject(object):
+	def __init__(self):
+		self.name = name
+
+
+class livingThing(gameObject):
+	def __init__(self, name="Living Thing", HP = 0):
+		self.name = name
+		self.HP = HP
+		self.alive = True
+		self.safe = True
+		self.listready = False
 
 class Animal(livingThing):
 	def __init__(self):
@@ -118,7 +131,7 @@ with open ('eukaryotes.txt', 'r') as file_stream:
 #for organism in popmaster:
 #	print(organism.truename, organism.type)
 
-popready = []
+
 
 def givetype(poplist):
 	typedict = {
@@ -138,9 +151,10 @@ def givetype(poplist):
 				tempname = organism.name
 				organism = typedict[key]
 				organism.name = tempname
-				print(organism.name, organism.type)
-
-			
+				organism.listready = True
+				#print(organism.name, organism.type)
+	
+	
 
 
 
@@ -157,6 +171,11 @@ def givetype(poplist):
 
 
 givetype(popmaster)
+
+popready = popmaster
+
+for organism in popready:
+	print(organism.name, organism.type)
 
 
 #[print(organism.name, organism.type) for organism in popready]

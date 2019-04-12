@@ -5,9 +5,9 @@ import re
 import os
 import pickle
 #import activityengine
-import gameclasses
-import organisms
-import shufflecipher
+from gameclasses import *
+#import organisms
+#import shufflecipher
 
 
 

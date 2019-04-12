@@ -3,7 +3,7 @@
 import sys
 import re
 import pickle
-
+from organisms import popmaster
 
 # Creates an object in-game with just a name (mostly exists just to allow for the cultivation of new fixed elements later)
 class gameObject(object):
@@ -38,7 +38,7 @@ class Player(Actor):
 	# Creates list of all options for a player to choose
 		self.optionlist = {
 			"add new activities" : self.getactivities,
-			"[demo] print all animals" : self.printanimals(popready),
+			"[demo] print all animals" : self.printanimals,
 			"play the game" : self.fourohfour,
 			"check my exp" : self.checkexp,
 			"quit game" : self.quitsave
@@ -79,8 +79,8 @@ class Player(Actor):
 		print("Ooops!  That's not working yet (but if this is \'play game\' it's not supposed to work, yet)!")
 
 
-	def printanimals(self, animallist):
-		for animal in animalist:
+	def printanimals(self):
+		for animal in popmaster:
 			print(animal.name, animal.type)
 
 # Used to strictly save the game (without quitting)
