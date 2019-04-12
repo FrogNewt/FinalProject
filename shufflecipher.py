@@ -37,7 +37,7 @@ def megacipher(organism):
 	}
 
 	megaorg = ""
-	for i in organism.lower():
+	for i in organism.name.lower():
 		if i in megadict.keys():
 			megaorg += megadict[i]
 		else:
@@ -56,7 +56,7 @@ def intercipher(organism):
 	"y" : "o",
 	}
 	interorg = ""
-	for i in organism.lower():
+	for i in organism.name.lower():
 		if i in interdict.keys():
 			interorg += interdict[i]
 		else:
@@ -106,12 +106,12 @@ print(orglist)
 # Shuffles all newly-cleaned organisms in orglist
 
 # By megacipher
-megaorglist = [megacipher(organism) for organism in orglist]
+#megaorglist = [megacipher(organism) for organism in orglist]
 #print(megaorglist)
 
 
 # By intercipher
-interorglist = [intercipher(organism) for organism in orglist]
+#interorglist = [intercipher(organism) for organism in orglist]
 
 #print(interorglist)
 

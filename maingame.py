@@ -7,11 +7,11 @@ import pickle
 #import activityengine
 from gameclasses import *
 #import organisms
-#import shufflecipher
+from shufflecipher import *
 
-
-
-
+#Shuffles organisms into unrecognizable names
+megaorglist = [megacipher(organism) for organism in popmaster]
+print(megaorglist)
 
 #newplayer = Player()
 
