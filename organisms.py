@@ -3,7 +3,7 @@
 import sys
 import re
 import pickle
-from gameclasses import *
+
 #from shufflecipher import *
 
 
@@ -134,7 +134,7 @@ def givetype(poplist):
 
 	for organism in poplist:
 		for key in typedict.keys():
-			if key==organism.type:
+			if (organism.type in key):
 				tempname = organism.name
 				organism = typedict[key]
 				organism.name = tempname
@@ -160,7 +160,7 @@ givetype(popmaster)
 
 
 #[print(organism.name, organism.type) for organism in popready]
-[print(organism.name, organism.type) for organism in popready]
+#[print(organism.name, organism.type) for organism in popready]
 #[print(organism.type) for organism in popmaster]
 
 

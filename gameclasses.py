@@ -4,6 +4,7 @@ import sys
 import re
 import pickle
 
+
 # Creates an object in-game with just a name (mostly exists just to allow for the cultivation of new fixed elements later)
 class gameObject(object):
 	def __init__(self):
@@ -37,6 +38,7 @@ class Player(Actor):
 	# Creates list of all options for a player to choose
 		self.optionlist = {
 			"add new activities" : self.getactivities,
+			"[demo] print all animals" : self.printanimals(popready),
 			"play the game" : self.fourohfour,
 			"check my exp" : self.checkexp,
 			"quit game" : self.quitsave
@@ -75,6 +77,11 @@ class Player(Actor):
 
 	def fourohfour(self):
 		print("Ooops!  That's not working yet (but if this is \'play game\' it's not supposed to work, yet)!")
+
+
+	def printanimals(self, animallist):
+		for animal in animalist:
+			print(animal.name, animal.type)
 
 # Used to strictly save the game (without quitting)
 	def save(self, namedfile="newgame1"):
@@ -189,12 +196,12 @@ class Player(Actor):
 					#		print("Ooops--that one didn't register.  Try entering it again!")
 				
 				# Checks to see if the user wants to add more activities before moving on to the next choice
-				print("All done with your activities for the day?")
+				print("One more activity?")
 				endinput = input("")
 				if "quit" in endinput:
 					self.quitsave()
 			
-				if ("y" in endinput):
+				if ("n" in endinput):
 					fullbreak = True
 
 					# Prompts user to save the game
