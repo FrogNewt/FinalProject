@@ -6,7 +6,7 @@ import pickle
 from organisms import popmaster
 from shufflecipher import *
 
-megashuffled = sorted([megacipher(animal) for animal in popmaster])
+#megashuffled = sorted([megacipher(animal) for animal in popmaster])
 
 
 # Creates an object in-game with just a name (mostly exists just to allow for the cultivation of new fixed elements later)

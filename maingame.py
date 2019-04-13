@@ -16,7 +16,7 @@ from gameclasses import *
 #newplayer = Player()
 
 
-print(megashuffled)
+
 
 
 newplayer = Player()

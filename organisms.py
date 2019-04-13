@@ -5,7 +5,7 @@ import re
 import pickle
 #from gameclasses import livingThing
 
-from shufflecipher import *
+from shufflecipher import megacipher
 
 
 
@@ -68,6 +68,9 @@ class Animal(livingThing):
 		self.truename = ""
 		self.type = ""
 		self.listready = False
+		self.type = "Test"
+		self.truetype = ""
+
 
 class Reptile(Animal):
 	def __init__(self):
@@ -93,25 +96,41 @@ class Mammal(Animal):
 		self.therm = "endo"
 		self.type = "Game Mammal"
 
+class Fungus(Animal):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Game Fungus"
 
+class Fungus(Animal):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Game Fungus"
+
+class Ascomycetes(Animal):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Game Ascomycetes"
 
 
 
 def populatemaster(masterlist):
-	popmaster = []
+	poptotal = []
 	i = 0
 	for element in masterlist:
 		organism = Animal()
 		organism.name = element
 		organism.truename = organism.name
-		popmaster.append(organism)
+		poptotal.append(organism)
 
-	for organism in popmaster:
+	for organism in poptotal:
  		megacipher(organism)
 
 
 	#[print(element.name) for element in popmaster]
-	return popmaster
+	return poptotal
 
 orglist = sorted(orglist)
 
@@ -123,7 +142,7 @@ popmaster = populatemaster(orglist)
 with open ('eukaryotes.txt', 'r') as file_stream:
 	for line in file_stream:
 		for organism in popmaster:
-			if organism.name in line:
+			if organism.truename in line:
 				organism.type = line.split('\t')[5]
 
 		# Note: Column 5 in Eukaryotes contains the "type" (Linnaean Class) of organism
@@ -150,7 +169,9 @@ def givetype(poplist):
 	"Reptiles" : Reptile(),
 	"Amphibians" : Amphibian(),
 	"Birds" : Bird(),
-	"Mammals" : Mammal()
+	"Mammals" : Mammal(),
+	"Fungi" : Fungus(),
+	"Ascomycetes" : Ascomycetes()
 	}
 	
 
@@ -164,7 +185,7 @@ def givetype(poplist):
 				organism = typedict[key]
 				organism.name = tempname
 				organism.listready = True
-				#print(organism.name, organism.type)
+				print(organism.name, organism.type)
 	
 	
 
@@ -174,7 +195,7 @@ def givetype(poplist):
 					
 
 
-				
+	return poplist
 
 
 				
@@ -184,10 +205,13 @@ def givetype(poplist):
 
 givetype(popmaster)
 
-popready = popmaster
+for organism in popmaster:
+	print(organism.type)
 
-for organism in popready:
-	print(organism.name, organism.type)
+#popready = popmaster
+
+#for organism in popmaster:
+#	print(organism.name, organism.type)
 
 
 #[print(organism.name, organism.type) for organism in popready]
