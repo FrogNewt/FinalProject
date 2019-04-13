@@ -86,11 +86,11 @@ class Player(Actor):
 
 	def printanimals(self):
 		for animal in popmaster:
-			print(animal.name, animal.type)
+			print(animal.truename, animal.type)
 
 	def printshuffled(self):
-		for animal in megashuffled:
-			print(animal)
+		for animal in popmaster:
+			print(animal.name)
 
 # Used to strictly save the game (without quitting)
 	def save(self, namedfile="newgame1"):

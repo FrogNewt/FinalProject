@@ -5,18 +5,22 @@ import re
 import pickle
 #from gameclasses import livingThing
 
-#from shufflecipher import *
-
-
-truemaster = set()
-typeslist = []
+from shufflecipher import *
 
 
 
 
 
+#truemaster = set()
+#typeslist = []
+
+
+
+
+# produces a "set" to become the orglist that'll temporarily contain all organisms
 orglist = set()
 
+# Creates the regular expression to be used in identifying proper scientific names in the database being scraped
 cleanup = r"^[A-Z].+$"
 
 compiledclean = re.compile(cleanup)
@@ -42,11 +46,12 @@ with open('scientificnames.txt', 'r') as file_stream:
 # Reads the fifth column in a tab-delimited line
 #[print(line.split('\t')[5]) for line in truemaster]
 
+# Class given to all objects to exist in the game.
 class gameObject(object):
 	def __init__(self):
 		self.name = name
 
-
+#Class given to any living thing in the game; confers basic stats
 class livingThing(gameObject):
 	def __init__(self, name="Living Thing", HP = 0):
 		self.name = name
@@ -54,6 +59,8 @@ class livingThing(gameObject):
 		self.alive = True
 		self.safe = True
 		self.listready = False
+
+# After livingThing, classes narrow into more specific groups that have unique traits, abilities, and roles in the game
 
 class Animal(livingThing):
 	def __init__(self):
@@ -86,7 +93,7 @@ class Mammal(Animal):
 		self.therm = "endo"
 		self.type = "Game Mammal"
 
-newanimal = Reptile()
+
 
 
 
@@ -98,6 +105,10 @@ def populatemaster(masterlist):
 		organism.name = element
 		organism.truename = organism.name
 		popmaster.append(organism)
+
+	for organism in popmaster:
+ 		megacipher(organism)
+
 
 	#[print(element.name) for element in popmaster]
 	return popmaster
@@ -132,7 +143,8 @@ with open ('eukaryotes.txt', 'r') as file_stream:
 #	print(organism.truename, organism.type)
 
 
-
+# Assigns each organism a game class based on the Linnaean taxonomic group to which it belongs
+# (And is most recognizable; e.g. "Reptile" over simply "Animal")
 def givetype(poplist):
 	typedict = {
 	"Reptiles" : Reptile(),

@@ -43,6 +43,7 @@ def megacipher(organism):
 		else:
 			megaorg += i
 	megaorg = megaorg.capitalize()
+	organism.name = megaorg
 	return megaorg
 
 
