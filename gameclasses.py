@@ -4,6 +4,10 @@ import sys
 import re
 import pickle
 from organisms import popmaster
+from shufflecipher import *
+
+megashuffled = sorted([megacipher(animal) for animal in popmaster])
+
 
 # Creates an object in-game with just a name (mostly exists just to allow for the cultivation of new fixed elements later)
 class gameObject(object):
@@ -39,6 +43,7 @@ class Player(Actor):
 		self.optionlist = {
 			"add new activities" : self.getactivities,
 			"[demo] print all animals" : self.printanimals,
+			"print shuffled" : self.printshuffled,
 			"play the game" : self.fourohfour,
 			"check my exp" : self.checkexp,
 			"quit game" : self.quitsave
@@ -82,6 +87,10 @@ class Player(Actor):
 	def printanimals(self):
 		for animal in popmaster:
 			print(animal.name, animal.type)
+
+	def printshuffled(self):
+		for animal in megashuffled:
+			print(animal)
 
 # Used to strictly save the game (without quitting)
 	def save(self, namedfile="newgame1"):
