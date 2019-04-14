@@ -13,9 +13,9 @@ def megacipher(organism):
 	"e" : "i",
 	"o" : "a",
 	"i" : "u",
-	"u" : "y",
+	"u" : "e",
 	"y" : "o",
-	"b" : "c",
+	"b" : "v",
 	"c" : "d",
 	"d" : "f",
 	"f" : "g",
@@ -28,21 +28,22 @@ def megacipher(organism):
 	"n" : "p",
 	"p" : "q",
 	"q" : "r",
-	"r" : "s",
+	"r" : "l",
 	"s" : "t",
-	"t" : "v",
+	"t" : "c",
 	"w" : "x",
 	"x" : "z",
 	"z" : "b"
 	}
 
 	megaorg = ""
-	for i in organism.name.lower():
-		if i in megadict.keys():
+	for i in organism.truename.lower():
+		if i.lower() in megadict.keys():
 			megaorg += megadict[i]
 		else:
 			megaorg += i
 	megaorg = megaorg.capitalize()
+	organism.meganame = megaorg
 	organism.name = megaorg
 	return megaorg
 
@@ -53,16 +54,17 @@ def intercipher(organism):
 	"e" : "i",
 	"o" : "a",
 	"i" : "u",
-	"u" : "y",
+	"u" : "e",
 	"y" : "o",
 	}
 	interorg = ""
-	for i in organism.name.lower():
+	for i in organism.truename.lower():
 		if i in interdict.keys():
 			interorg += interdict[i]
 		else:
 			interorg += i
 	interorg = interorg.capitalize()
+	organism.intername = interorg
 	return interorg
 
 

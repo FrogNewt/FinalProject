@@ -5,7 +5,7 @@ import re
 import pickle
 #from gameclasses import livingThing
 
-from shufflecipher import megacipher
+from shufflecipher import megacipher, intercipher
 
 
 
@@ -139,18 +139,30 @@ def populatemaster(masterlist):
 		organism.truename = organism.name
 		poptotal.append(organism)
 
-	for organism in poptotal:
- 		megacipher(organism)
+	#for organism in poptotal:
+ 		#megacipher(organism)
 
 
 	#[print(element.name) for element in popmaster]
 	return poptotal
+
+
+def shuffleboth(poplist):
+	templist = []
+	for org in poplist:
+		megaorg = megacipher(org)
+		interorg = intercipher(org)
+		
+	return poplist
 
 orglist = sorted(orglist)
 
 #print(orglist)
 
 popmaster = populatemaster(orglist)
+
+
+
 
 
 
@@ -247,9 +259,8 @@ def givetype(poplist):
 
 popmaster = givetype(popmaster)
 
+popmaster = shuffleboth(popmaster)
 
-for animal in popmaster:
-	print(animal.name, animal.truename, animal.type)
 
 #print("The length after giving types is: {0}".format(len(popmaster)))
 

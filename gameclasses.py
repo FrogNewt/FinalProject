@@ -86,7 +86,8 @@ class Player(Actor):
 
 	def printanimals(self):
 		for animal in popmaster:
-			print(animal.truename, animal.type)
+			print("True Name: " + animal.truename + "\n", "Mega-Shuffled Name: " + animal.meganame + "\n","Inter-Shuffled Name: " + animal.intername + "\n", "Type: " + animal.type + "\n")
+
 
 	def printshuffled(self):
 		for animal in popmaster:
