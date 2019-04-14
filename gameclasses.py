@@ -43,7 +43,6 @@ class Player(Actor):
 		self.optionlist = {
 			"add new activities" : self.getactivities,
 			"[demo] print all animals" : self.printanimals,
-			"print shuffled" : self.printshuffled,
 			"play the game" : self.fourohfour,
 			"check my exp" : self.checkexp,
 			"quit game" : self.quitsave
@@ -83,55 +82,6 @@ class Player(Actor):
 	def fourohfour(self):
 		print("Ooops!  That's not working yet (but if this is \'play game\' it's not supposed to work, yet)!")
 
-
-	def printanimals(self):
-		for animal in popmaster:
-			print("True Name: " + animal.truename + "\n", "Mega-Shuffled Name: " + animal.meganame + "\n","Inter-Shuffled Name: " + animal.intername + "\n", "Type: " + animal.type + "\n")
-
-
-	def printshuffled(self):
-		for animal in popmaster:
-			print(animal.name)
-
-# Used to strictly save the game (without quitting)
-	def save(self, namedfile="newgame1"):
-		save = input("Save game? (y/n)\n")
-		if "y" in save:
-			print("Choose a filename! (Default is '{0}') ".format(namedfile))
-			userinput = input("")
-			if not userinput:
-				with open(namedfile+'.pickle', 'wb') as handle:
-					pickle.dump(self, handle)
-					print("Game Saved to default!")
-			elif userinput:	
-				with open(userinput+'.pickle', 'wb') as handle:
-					pickle.dump(self, handle)
-					print("Game Saved!")
-		else:
-			print("Game not saved!")
-
-# Verifies that the user wants to quit and offers to save the game
-	def quitsave(self, namedfile="newgame1"):
-			choice = input("Are you sure you want to quit? ")
-			if "y" in choice:
-				save = input("Save game? (y/n)\n")
-				if "y" in save:
-					print("Choose a filename! (Default is '{0}') ".format(namedfile))
-					userinput = input("")
-					if not userinput:
-						with open(namedfile+'.pickle', 'wb') as handle:
-							pickle.dump(self, handle)
-							print("Game Saved to default!")
-					elif userinput:	
-						with open(userinput+'.pickle', 'wb') as handle:
-							pickle.dump(self, handle)
-							print("Game Saved!")
-				else:
-					print("Game not saved!")
-				print("Shutting it down!")
-				quit()
-			else:
-				pass
 
 	# Main method for gaining experience in the game; varies (or will vary) between flexible and fixed modes
 	def getactivities(self):
@@ -211,7 +161,7 @@ class Player(Actor):
 				if "quit" in endinput:
 					self.quitsave()
 			
-				if ("n" in endinput):
+				if ("n" in endinput and (len(endinput) < 2)) or ("no" in endinput):
 					fullbreak = True
 
 					# Prompts user to save the game
@@ -225,6 +175,57 @@ class Player(Actor):
 
 			if fullbreak == True:
 				break
+
+	def printanimals(self):
+		for animal in popmaster:
+			print("True Name: " + animal.truename + "\n", "Mega-Shuffled Name: " + animal.meganame + "\n","Inter-Shuffled Name: " + animal.intername + "\n", "Type: " + animal.type + "\n")
+
+
+	def printshuffled(self):
+		for animal in popmaster:
+			print(animal.name)
+
+# Used to strictly save the game (without quitting)
+	def save(self, namedfile="newgame1"):
+		save = input("Save game? (y/n)\n")
+		if "y" in save:
+			print("Choose a filename! (Default is '{0}') ".format(namedfile))
+			userinput = input("")
+			if not userinput:
+				with open(namedfile+'.pickle', 'wb') as handle:
+					pickle.dump(self, handle)
+					print("Game Saved to default!")
+			elif userinput:	
+				with open(userinput+'.pickle', 'wb') as handle:
+					pickle.dump(self, handle)
+					print("Game Saved!")
+		else:
+			print("Game not saved!")
+
+# Verifies that the user wants to quit and offers to save the game
+	def quitsave(self, namedfile="newgame1"):
+			choice = input("Are you sure you want to quit? ")
+			if "y" in choice:
+				save = input("Save game? (y/n)\n")
+				if "y" in save:
+					print("Choose a filename! (Default is '{0}') ".format(namedfile))
+					userinput = input("")
+					if not userinput:
+						with open(namedfile+'.pickle', 'wb') as handle:
+							pickle.dump(self, handle)
+							print("Game Saved to default!")
+					elif userinput:	
+						with open(userinput+'.pickle', 'wb') as handle:
+							pickle.dump(self, handle)
+							print("Game Saved!")
+				else:
+					print("Game not saved!")
+				print("Shutting it down!")
+				quit()
+			else:
+				pass
+
+	
 
 
 
