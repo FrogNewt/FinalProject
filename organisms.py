@@ -70,6 +70,7 @@ class Animal(livingThing):
 		self.listready = False
 		self.type = "Test"
 		self.truetype = ""
+		self.hasatype = False
 
 
 class Reptile(Animal):
@@ -162,51 +163,83 @@ with open ('eukaryotes.txt', 'r') as file_stream:
 #	print(organism.truename, organism.type)
 
 
+### DUMMY LIST TO BE USED IN DEBUGGING; CAN BE SUBSTITUTED FOR LARGER DATASET ###
+somereptile = Reptile()
+somereptile.type = "Reptiles"
+somereptile.name = "Some Reptile"
+
+somefrog = Amphibian()
+somefrog.type = "Amphibians"
+somefrog.name = "Some frog"
+
+somefungus = Fungus()
+somefungus.type = "Fungi"
+somefungus.name = "Some Fungus"
+
+secondfrog = Amphibian()
+secondfrog.type = "Amphibians"
+secondfrog.name = "Second Frog"
+
+thirdfrog = Amphibian()
+thirdfrog.type = "Amphibians"
+thirdfrog.name = "Third Frog"
+
+secondfungus = Fungus()
+secondfungus.type = "Fungi"
+secondfungus.name = "Second Fungus"
+
+dummypop = [somereptile, somefrog, somefungus, secondfrog, thirdfrog, secondfungus]
+
+
 # Assigns each organism a game class based on the Linnaean taxonomic group to which it belongs
 # (And is most recognizable; e.g. "Reptile" over simply "Animal")
 def givetype(poplist):
 	typedict = {
-	"Reptiles" : Reptile(),
-	"Amphibians" : Amphibian(),
-	"Birds" : Bird(),
-	"Mammals" : Mammal(),
-	"Fungi" : Fungus(),
-	"Ascomycetes" : Ascomycetes()
+	"Reptiles" : Reptile,
+	"Amphibians" : Amphibian,
+	"Birds" : Bird,
+	"Mammals" : Mammal,
+	"Fungi" : Fungus,
+	"Ascomycetes" : Ascomycetes
 	}
 	
 
-	templist = []
-	tempname = ""
+	holderlist = []
+	tempnames = []
+	i = 0
 
-	for organism in poplist:
+
+	### THIS WORKS NOW BECAUSE I'M INSTANTIATING EACH CLASS IN THE FOR LOOP INSTEAD OF ABOVE IN THE DICTIONARY--
+	### I.E. IF YOU PUT () PARENTHESES IN THE DICTIONARY VALUES, IT ONLY INSTANTIATES EACH CLASS ONCE INSTEAD OF EACH TIME
+	for org in poplist:
+		holderlist.append(org)
+		tempnames.append(org.name)
 		for key in typedict.keys():
-			if (organism.type in key):
-				tempname = organism.name
-				organism = typedict[key]
-				organism.name = tempname
-				organism.listready = True
-				print(organism.name, organism.type)
+			if (holderlist[i].type.lower() in key.lower()):
+				holderlist[i] = typedict[key]()
+				holderlist[i].name = tempnames[i]
+				#print(holderlist[i], holderlist[i].type)
+		i+=1
+
+	return holderlist
+
 	
-	
 
+print("The length before giving types is: {0}".format(len(popmaster)))
 
+popmaster = (givetype(popmaster))
 
+print("The length after giving types is: {0}".format(len(popmaster)))
 
-					
+#for animal in popmaster:
+#	print(animal.name, animal.type)
 
+#print(popmaster)
 
-	return poplist
+#dummymaster = (givetype(dummypop))
 
-
-				
-				#print(organism.name, organism.type)
-
-
-
-givetype(popmaster)
-
-for organism in popmaster:
-	print(organism.type)
+#for animal in dummymaster:
+#	print(animal.name, animal.type)
 
 #popready = popmaster
 
