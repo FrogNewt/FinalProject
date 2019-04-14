@@ -59,6 +59,7 @@ class livingThing(gameObject):
 		self.alive = True
 		self.safe = True
 		self.listready = False
+		self.truename = ""
 
 # After livingThing, classes narrow into more specific groups that have unique traits, abilities, and roles in the game
 
@@ -115,8 +116,20 @@ class Ascomycetes(Animal):
 		self.therm = "none"
 		self.type = "Game Ascomycetes"
 
+class Fish(Animal):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Game Fish"
+
+class Insect(Animal):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Game Insect"
 
 
+# Populates master list of organisms to be used in the game; can be later sorted
 def populatemaster(masterlist):
 	poptotal = []
 	i = 0
@@ -140,11 +153,13 @@ orglist = sorted(orglist)
 popmaster = populatemaster(orglist)
 
 
-with open ('eukaryotes.txt', 'r') as file_stream:
-	for line in file_stream:
-		for organism in popmaster:
-			if organism.truename in line:
-				organism.type = line.split('\t')[5]
+
+def scrapetypes(poplist):
+	with open ('eukaryotes.txt', 'r') as file_stream:
+		for line in file_stream:
+			for organism in poplist:
+				if organism.truename in line:
+					organism.type = line.split('\t')[5]
 
 		# Note: Column 5 in Eukaryotes contains the "type" (Linnaean Class) of organism
 		#typeslist.append(line.split('\t')[5])
@@ -156,7 +171,7 @@ with open ('eukaryotes.txt', 'r') as file_stream:
 		#if m is None:
 			#truemaster.add(org_line)
 
-
+scrapetypes(popmaster)
 
 
 #for organism in popmaster:
@@ -200,7 +215,9 @@ def givetype(poplist):
 	"Birds" : Bird,
 	"Mammals" : Mammal,
 	"Fungi" : Fungus,
-	"Ascomycetes" : Ascomycetes
+	"Ascomycetes" : Ascomycetes,
+	"Insects" : Insect,
+	"Fishes" : Fish,
 	}
 	
 
@@ -217,6 +234,7 @@ def givetype(poplist):
 		for key in typedict.keys():
 			if (holderlist[i].type.lower() in key.lower()):
 				holderlist[i] = typedict[key]()
+				holderlist[i].truename = tempnames[i]
 				holderlist[i].name = tempnames[i]
 				#print(holderlist[i], holderlist[i].type)
 		i+=1
@@ -225,11 +243,15 @@ def givetype(poplist):
 
 	
 
-print("The length before giving types is: {0}".format(len(popmaster)))
+#print("The length before giving types is: {0}".format(len(popmaster)))
 
-popmaster = (givetype(popmaster))
+popmaster = givetype(popmaster)
 
-print("The length after giving types is: {0}".format(len(popmaster)))
+
+for animal in popmaster:
+	print(animal.name, animal.truename, animal.type)
+
+#print("The length after giving types is: {0}".format(len(popmaster)))
 
 #for animal in popmaster:
 #	print(animal.name, animal.type)
