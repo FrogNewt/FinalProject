@@ -75,7 +75,7 @@ class Organism(livingThing):
 		self.truename = ""
 		self.type = ""
 		self.listready = False
-		self.type = "Test"
+		self.type = "Organism"
 		self.truetype = ""
 		self.hasatype = False
 		self.power = False
@@ -85,18 +85,18 @@ class Organism(livingThing):
 		self.strength = 1
 		self.speed = 1
 		self.luck = 1
+		self.skit = 1
 		self.evolvable = True
 		self.mobile = True
 		
 		# Organizes all combat stats into a list
-		self.basestats = [
-		self.type,
-		self.HP,
-		self.speed,
-		self.luck,
-		self.evolvable,
-		self.mobile
-		]
+		self.stats = {
+		"HP" : self.HP,
+		"Strength" : self.strength,
+		"Speed" : self.speed,
+		"Skittishness" : self.skit,
+		"Luck" : self.luck,
+		}
 
 
 class Reptile(Organism):
@@ -104,7 +104,9 @@ class Reptile(Organism):
 		super().__init__()
 		self.therm = "ecto"
 		self.type = "Reptile"
-		self.power = self.strength * 2
+		def power(self):
+			power = self.strength * 2
+			self.stats["Strength"] = power
 
 class Amphibian(Organism):
 	def __init__(self):
