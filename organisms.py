@@ -23,6 +23,7 @@ orglist = set()
 # Creates the regular expression to be used in identifying proper scientific names in the database being scraped
 cleanup = r"^[A-Z].+$"
 
+# Compiles the regex
 compiledclean = re.compile(cleanup)
 
 
@@ -88,6 +89,7 @@ class Organism(livingThing):
 		self.skit = 1
 		self.evolvable = True
 		self.mobile = True
+		self.gold = 1
 		
 		# Organizes all combat stats into a list
 		self.stats = {
@@ -96,6 +98,7 @@ class Organism(livingThing):
 		"Speed" : self.speed,
 		"Skittishness" : self.skit,
 		"Luck" : self.luck,
+		"Gold" : self.gold
 		}
 
 
@@ -115,6 +118,9 @@ class Amphibian(Organism):
 		super().__init__()
 		self.therm = "ecto"
 		self.type = "Amphibian"
+		self.power = True
+	def poweron(self):
+		self.stats["Luck"] = self.stats["Luck"] * 2
 
 class Bird(Organism):
 	def __init__(self):
@@ -128,12 +134,9 @@ class Mammal(Organism):
 		self.therm = "endo"
 		self.power = ""
 		self.type = "Mammal"
-
-class Fungus(Organism):
-	def __init__(self):
-		super().__init__()
-		self.therm = "none"
-		self.type = "Fungus"
+		self.power = True
+	def poweron(self):
+		self.stats["HP"] = self.stats["HP"] * 5
 
 class Fungus(Organism):
 	def __init__(self):
@@ -146,6 +149,7 @@ class Ascomycetes(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "none"
+		self.mobile = False
 		self.type = "Ascomycetes"
 
 class Fish(Organism):
@@ -159,6 +163,11 @@ class Insect(Organism):
 		super().__init__()
 		self.therm = "none"
 		self.type = "Insect"
+		self.power = True
+	def poweron(self):
+		self.stats["Skittishness"] = self.stats["Skittishness"] * 5
+		self.stats["Gold"] = self.stats["Gold"] * 10
+		self.stats["Luck"] = self.stats["Luck"] * 3
 
 class Plant(Organism):
 	def __init__(self):
@@ -172,6 +181,65 @@ class Protist(Organism):
 		super().__init__()
 		self.therm = "none"
 		self.type = "Protist"
+		self.mobile = False
+
+class Dragon(Organism):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Dragon"
+		self.power = True
+	def poweron(self):
+		self.stats["Strength"] = self.stats["Strength"] * 10
+		self.stats["HP"] = self.stats["HP"] * 10
+		self.stats["Speed"] = self.stats["Speed"] * 10
+		self.stats["Gold"] = self.stats["Gold"] * 100
+
+class Kinetoplast(Organism):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Kinetoplast"
+		self.mobile = False
+
+class Basidiomycetes(Organism):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Basidiomycetes"
+		self.mobile = False
+
+class Apicomplexan(Organism):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Apicomplexan"
+		self.mobile = False
+
+class greenAlgae(Organism):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Green Algae"
+		self.mobile = False
+
+class Flatworm(Organism):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Flatworm"
+
+class Roundworm(Organism):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Roundworm"
+
+class Monster(Organism):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Monster"
 
 # Populates master list of organisms to be used in the game; can be later sorted
 def populatemaster(masterlist):
@@ -275,7 +343,15 @@ def givetype(poplist):
 	"Insects" : Insect,
 	"Fishes" : Fish,
 	"Plant" : Plant,
-	"Protist" : Protist
+	"Protist" : Protist,
+	"Kinetoplasts" : Kinetoplast,
+	"Other Animals" : Dragon,
+	"Other" : Monster,
+	"Organism" : Monster,
+	"Basidiomycetes" : Basidiomycetes,
+	"Apicomplexans" : Apicomplexan,
+	"Flatworms" : Flatworm,
+	"Roundworms" : Roundworm
 	}
 	
 
@@ -305,9 +381,5 @@ popmaster = givetype(popmaster)
 
 # Actively shuffles ciphered names for all the organisms into place
 popmaster = shuffleboth(popmaster)
-
-for organism in popmaster:
-	if organism.power:
-		print(organism.power)
 
 

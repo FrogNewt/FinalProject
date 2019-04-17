@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import re
 import pickle
 from organisms import popmaster
 from shufflecipher import *
 
-#megashuffled = sorted([megacipher(animal) for animal in popmaster])
+
+def shufflebegin(poplist):
+	for organism in poplist:
+		organism.name = organism.meganame
+
+shufflebegin(popmaster)
 
 
 # Creates an object in-game with just a name (mostly exists just to allow for the cultivation of new fixed elements later)
@@ -16,11 +22,16 @@ class gameObject(object):
 
 
 class livingThing(gameObject):
-	def __init__(self, name="Living Thing", HP = 0):
+	def __init__(self, name="Living Thing", HP = 1):
 		self.name = name
 		self.HP = HP
 		self.alive = True
 		self.safe = True
+
+# A dummy organism to be used for testing
+trash = livingThing()
+trash.name = "Piece of Trash"
+trash.type = "...true piece of garbage"
 
 class Actor(livingThing):
 	def __init__(self, name, HP = 0, MP = 0):
@@ -44,6 +55,8 @@ class Player(Actor):
 			"add new activities" : self.getactivities,
 			"[demo] print all animals" : self.printanimals,
 			"play the game" : self.fourohfour,
+			"capture" : self.capture,
+			"go exploring" : self.explore,
 			"check my exp" : self.checkexp,
 			"quit game" : self.quitsave
 		}
@@ -52,7 +65,7 @@ class Player(Actor):
 		self.inventory = []
 		self.gold = 0
 		self.equipment = []
-
+		self.bestiary = []
 
 	#  Now-defunct mechanism for beginning the game
 	#def opener(self):
@@ -73,12 +86,24 @@ class Player(Actor):
 	#				break
 
 
-	#Prompts the player to save the game and either writes to a new file or overwrites an existing file
 	
+	
+	# Attempts to capture the current target
+	def capture(self, organism = trash):
+		self.bestiary.append(organism)
+		print("You've captured a wild {0}--it looks like it might be a {1}!".format(organism.name, organism.type))
+		print(self.bestiary)
+
+	# Checks to see how much experience the user has in each area
 	def checkexp(self):
 		print(self.expdict)
 
+	# Go exploring in the world!
+	def explore(self):
+		envchoice = input("Great!  Where would you like to go?")
+		
 
+	# General error message
 	def fourohfour(self):
 		print("Ooops!  That's not working yet (but if this is \'play game\' it's not supposed to work, yet)!")
 
@@ -176,14 +201,12 @@ class Player(Actor):
 			if fullbreak == True:
 				break
 
+
+# Used to print out all animals and their shuffled names for debugging use
 	def printanimals(self):
 		for animal in popmaster:
-			print("True Name: " + animal.truename + "\n", "Mega-Shuffled Name: " + animal.meganame + "\n","Inter-Shuffled Name: " + animal.intername + "\n", "Type: " + animal.type + "\n")
+			print("Current Name:" + animal.name + "\n", "True Name: " + animal.truename + "\n", "Mega-Shuffled Name: " + animal.meganame + "\n","Inter-Shuffled Name: " + animal.intername + "\n", "Type: " + animal.type + "\n")
 
-
-	def printshuffled(self):
-		for animal in popmaster:
-			print(animal.name)
 
 # Used to strictly save the game (without quitting)
 	def save(self, namedfile="newgame1"):
@@ -192,10 +215,19 @@ class Player(Actor):
 			print("Choose a filename! (Default is '{0}') ".format(namedfile))
 			userinput = input("")
 			if not userinput:
-				with open(namedfile+'.pickle', 'wb') as handle:
+				outdir = os.path.join(os.path.curdir, "Saves")
+				print(outdir)
+				if not os.path.exists(outdir):
+					os.mkdir(outdir)
+				# os.makedirs("my_folder1")
+				path = os.path.join(outdir, namedfile+".pickle")
+				print(path)
+				print("wolverine")
+				with open(path, 'wb') as handle:
 					pickle.dump(self, handle)
 					print("Game Saved to default!")
 			elif userinput:	
+				os.makedir('SaveFiles')
 				with open(userinput+'.pickle', 'wb') as handle:
 					pickle.dump(self, handle)
 					print("Game Saved!")
@@ -206,20 +238,7 @@ class Player(Actor):
 	def quitsave(self, namedfile="newgame1"):
 			choice = input("Are you sure you want to quit? ")
 			if "y" in choice:
-				save = input("Save game? (y/n)\n")
-				if "y" in save:
-					print("Choose a filename! (Default is '{0}') ".format(namedfile))
-					userinput = input("")
-					if not userinput:
-						with open(namedfile+'.pickle', 'wb') as handle:
-							pickle.dump(self, handle)
-							print("Game Saved to default!")
-					elif userinput:	
-						with open(userinput+'.pickle', 'wb') as handle:
-							pickle.dump(self, handle)
-							print("Game Saved!")
-				else:
-					print("Game not saved!")
+				self.save(namedfile)
 				print("Shutting it down!")
 				quit()
 			else:

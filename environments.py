@@ -21,8 +21,7 @@ def genorgs(env, poplist):
 	# This can be amended to operate within a range.
 	for org in poplist:
 		if org.mobile == True:
-			if org.type == "Reptile":
-				templist.append(org)
+			templist.append(org)
 	for i in range(env.animalnum):
 		newchoice = random.choice(templist)
 		pickedlist.append(newchoice)
@@ -38,8 +37,6 @@ def assignstats(env, orgs):
 				org.stats[stat] = org.stats[stat] * env.difficulty
 		if org.power:
 			org.poweron()
-		if org.printdemo:
-			org.printdemo()
 	return statorgs
 
 
@@ -55,14 +52,25 @@ class startArea(basicEnv):
 	def __init__(self):
 		super().__init__()
 		self.animalnum = 10
-		self.difficulty = 2
+		self.difficulty = 1
+		self.name = "An Opening Area"
+
+class Bog(basicEnv):
+	def __init__(self):
+		super().__init__()
+		self.animalnum = 10
+		self.difficulty = 1
+		self.name = "A Bog"
+
 
 
 startarea = startArea()
 
-demolist = genorgs(startarea, poppop)
+startorgs = genorgs(startarea, poppop)
 
-newlist = assignstats(startarea, demolist)
+newlist = assignstats(startarea, startorgs)
+
+
 
 for x in newlist:
 	for stat in x.stats.keys():
