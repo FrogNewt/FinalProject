@@ -27,20 +27,26 @@ compiledclean = re.compile(cleanup)
 
 
 #temporglist = []
-with open('scientificnames.txt', 'r') as file_stream:
-	for line in file_stream:
-		org_line = line.strip()
-		org_name = org_line.split('\t')[0]
-		#org_type = org_line.split('\t')[5]
-		#temporglist.append(org_name)
-		org_name = org_name.replace('[', '')
-		org_name = org_name.replace(']', '')
-		org_name = org_name.replace(' sp.', '')
-		m = compiledclean.match(org_name)
-		# You could also use if !m: effectively
-		if m:
-			#print(line)
-			orglist.add(org_name)
+
+# Opens the scientific names of organisms and reads them in with revisions to help with organization
+def openitup():
+	with open('scientificnames.txt', 'r') as file_stream:
+		for line in file_stream:
+			org_line = line.strip()
+			org_name = org_line.split('\t')[0]
+			#org_type = org_line.split('\t')[5]
+			#temporglist.append(org_name)
+			org_name = org_name.replace('[', '')
+			org_name = org_name.replace(']', '')
+			org_name = org_name.replace(' sp.', '')
+			m = compiledclean.match(org_name)
+			# You could also use if !m: effectively
+			if m:
+				#print(line)
+				orglist.add(org_name)
+
+
+openitup()
 			
 
 # Reads the fifth column in a tab-delimited line
@@ -63,7 +69,7 @@ class livingThing(gameObject):
 
 # After livingThing, classes narrow into more specific groups that have unique traits, abilities, and roles in the game
 
-class Animal(livingThing):
+class Organism(livingThing):
 	def __init__(self):
 		super().__init__()
 		self.truename = ""
@@ -72,69 +78,103 @@ class Animal(livingThing):
 		self.type = "Test"
 		self.truetype = ""
 		self.hasatype = False
+		self.power = False
+
+		# Combat Stats
+		self.HP = 10
+		self.strength = 1
+		self.speed = 1
+		self.luck = 1
+		self.evolvable = True
+		self.mobile = True
+		
+		# Organizes all combat stats into a list
+		self.basestats = [
+		self.type,
+		self.HP,
+		self.speed,
+		self.luck,
+		self.evolvable,
+		self.mobile
+		]
 
 
-class Reptile(Animal):
+class Reptile(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "ecto"
-		self.type = "Game Reptile"
+		self.type = "Reptile"
+		self.power = self.strength * 2
 
-class Amphibian(Animal):
+class Amphibian(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "ecto"
-		self.type = "Game Amphibian"
+		self.type = "Amphibian"
 
-class Bird(Animal):
+class Bird(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "endo"
-		self.type = "Game Bird"
+		self.type = "Bird"
 
-class Mammal(Animal):
+class Mammal(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "endo"
-		self.type = "Game Mammal"
+		self.power = ""
+		self.type = "Mammal"
 
-class Fungus(Animal):
+class Fungus(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "none"
-		self.type = "Game Fungus"
+		self.type = "Fungus"
 
-class Fungus(Animal):
+class Fungus(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "none"
-		self.type = "Game Fungus"
+		self.type = "Fungus"
+		self.mobile = False
 
-class Ascomycetes(Animal):
+class Ascomycetes(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "none"
-		self.type = "Game Ascomycetes"
+		self.type = "Ascomycetes"
 
-class Fish(Animal):
+class Fish(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "none"
-		self.type = "Game Fish"
+		self.type = "Fish"
 
-class Insect(Animal):
+class Insect(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "none"
-		self.type = "Game Insect"
+		self.type = "Insect"
 
+class Plant(Organism):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Plant"
+		self.mobile = False
+
+class Protist(Organism):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Protist"
 
 # Populates master list of organisms to be used in the game; can be later sorted
 def populatemaster(masterlist):
 	poptotal = []
 	i = 0
 	for element in masterlist:
-		organism = Animal()
+		organism = Organism()
 		organism.name = element
 		organism.truename = organism.name
 		poptotal.append(organism)
@@ -219,7 +259,7 @@ dummypop = [somereptile, somefrog, somefungus, secondfrog, thirdfrog, secondfung
 
 
 # Assigns each organism a game class based on the Linnaean taxonomic group to which it belongs
-# (And is most recognizable; e.g. "Reptile" over simply "Animal")
+# (And is most recognizable; e.g. "Reptile" over simply "Organism")
 def givetype(poplist):
 	typedict = {
 	"Reptiles" : Reptile,
@@ -230,6 +270,8 @@ def givetype(poplist):
 	"Ascomycetes" : Ascomycetes,
 	"Insects" : Insect,
 	"Fishes" : Fish,
+	"Plant" : Plant,
+	"Protist" : Protist
 	}
 	
 
@@ -244,7 +286,7 @@ def givetype(poplist):
 		holderlist.append(org)
 		tempnames.append(org.name)
 		for key in typedict.keys():
-			if (holderlist[i].type.lower() in key.lower()):
+			if (key.lower() in holderlist[i].type.lower()):
 				holderlist[i] = typedict[key]()
 				holderlist[i].truename = tempnames[i]
 				holderlist[i].name = tempnames[i]
@@ -254,39 +296,14 @@ def givetype(poplist):
 	return holderlist
 
 	
-
-#print("The length before giving types is: {0}".format(len(popmaster)))
-
+# Actively generates game types for the organisms
 popmaster = givetype(popmaster)
 
+# Actively shuffles ciphered names for all the organisms into place
 popmaster = shuffleboth(popmaster)
 
-
-#print("The length after giving types is: {0}".format(len(popmaster)))
-
-#for animal in popmaster:
-#	print(animal.name, animal.type)
-
-#print(popmaster)
-
-#dummymaster = (givetype(dummypop))
-
-#for animal in dummymaster:
-#	print(animal.name, animal.type)
-
-#popready = popmaster
-
-#for organism in popmaster:
-#	print(organism.name, organism.type)
-
-
-#[print(organism.name, organism.type) for organism in popready]
-#[print(organism.name, organism.type) for organism in popready]
-#[print(organism.type) for organism in popmaster]
-
-
-#populatemaster(megaorglist)
-
-
+for organism in popmaster:
+	if organism.power:
+		print(organism.power)
 
 
