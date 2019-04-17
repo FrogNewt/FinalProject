@@ -30,13 +30,17 @@ def genorgs(env, poplist):
 	return pickedlist
 
 def assignstats(env, orgs):
+	statorgs = []
 	for org in orgs:
-		for stat in org.stats.keys():
-			org.stats[stat] * env.difficulty
-			print(org.stats[stat])
-			if org.power:
-				org.power()
-	return orgs
+		if org not in statorgs:
+			statorgs.append(org)
+			for stat in org.stats.keys():
+				org.stats[stat] = org.stats[stat] * env.difficulty
+		if org.power:
+			org.poweron()
+		if org.printdemo:
+			org.printdemo()
+	return statorgs
 
 
 

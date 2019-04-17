@@ -104,9 +104,11 @@ class Reptile(Organism):
 		super().__init__()
 		self.therm = "ecto"
 		self.type = "Reptile"
-		def power(self):
-			power = self.strength * 2
-			self.stats["Strength"] = power
+		self.power = True
+	def poweron(self):
+		self.stats["Strength"] = self.stats["Strength"] * 2
+	def printdemo(self):
+		print("Printing a demo")
 
 class Amphibian(Organism):
 	def __init__(self):
