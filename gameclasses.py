@@ -16,6 +16,7 @@ def begingame():
 		if "n" in welcome.lower():
 			popmain.shufflebegin()
 			newplayer = Player()
+			newplayer.popmaster = popmain.popmaster
 			return newplayer
 		elif "l" in welcome.lower():
 			path = "Saves/"
@@ -39,6 +40,7 @@ def begingame():
 			else:
 				print("There are no saved files--starting a new game!")
 				newplayer = Player()
+				popmain.shufflebegin()
 				return newplayer
 
 def choosenext(self):
@@ -97,6 +99,7 @@ class Actor(livingThing):
 class Player(Actor):
 	def __init__(self, name = "Unknown"):
 		self.name = name
+		self.popmaster = []
 		
 	# Links categories and related activities
 		self.activitydict = {"fitness" : {"walk" : 5, "run" : 10}, "intellect" : {}, "intellect" : {}, "happiness" : {}}
@@ -259,7 +262,7 @@ class Player(Actor):
 
 # Used to print out all animals and their shuffled names for debugging use
 	def printanimals(self):
-		for animal in popmain.popmaster:
+		for animal in self.popmaster:
 			print("Current Name:" + animal.name + "\n", "True Name: " + animal.truename + "\n", "Mega-Shuffled Name: " + animal.meganame + "\n","Inter-Shuffled Name: " + animal.intername + "\n", "Type: " + animal.type + "\n")
 
 
@@ -278,6 +281,7 @@ class Player(Actor):
 				path = os.path.join(outdir, namedfile+".pickle")
 				print(path)
 				print("wolverine")
+				
 				with open(path, 'wb') as handle:
 					pickle.dump(self, handle)
 					print("Game Saved to default!")
@@ -313,18 +317,17 @@ popmain = Population()
 
 
 
-"""
+
 startarea = startArea()
 
 bog = Bog()
 
-startorgs = genorgs(startarea, poppop)
+#startorgs = genorgs(startarea, poppop)
 
-bogorgs = genorgs(bog, poppop)
+#bogorgs = genorgs(bog, poppop)
 
-newlist = assignstats(startarea, startorgs)
+#newlist = assignstats(startarea, startorgs)
 
-biggerlist = assignstats(bog, bogorgs)
-	"""
+#biggerlist = assignstats(bog, bogorgs)
 
-		
+
