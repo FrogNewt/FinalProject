@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-import sys
+
+### TURN ALL BACK ON AFTER DEBUGGING ###
+#import sys
 import re
-import pickle
-#from gameclasses import livingThing
+#import pickle
 
 from shufflecipher import megacipher, intercipher
 
@@ -18,19 +19,19 @@ from shufflecipher import megacipher, intercipher
 
 
 # produces a "set" to become the orglist that'll temporarily contain all organisms
-orglist = set()
 
-# Creates the regular expression to be used in identifying proper scientific names in the database being scraped
-cleanup = r"^[A-Z].+$"
+# Backup to be turned back on if things don't work
+norglist = set()
 
-# Compiles the regex
-compiledclean = re.compile(cleanup)
-
-
-#temporglist = []
 
 # Opens the scientific names of organisms and reads them in with revisions to help with organization
 def openitup():
+	orglist = set()
+	# Creates the regular expression to be used in identifying proper scientific names in the database being scraped
+	cleanup = r"^[A-Z].+$"
+
+	# Compiles the regex
+	compiledclean = re.compile(cleanup)
 	with open('scientificnames.txt', 'r') as file_stream:
 		for line in file_stream:
 			org_line = line.strip()
@@ -45,9 +46,11 @@ def openitup():
 			if m:
 				#print(line)
 				orglist.add(org_name)
+	return orglist
 
 
-openitup()
+### TURN BACK ON AFTER DEBUGGING ###
+#openitup()
 			
 
 # Reads the fifth column in a tab-delimited line
@@ -267,11 +270,18 @@ def shuffleboth(poplist):
 		
 	return poplist
 
-orglist = sorted(orglist)
+def sortorglist(orglist):
+	orglist = sorted(orglist)
+	return orglist
+
+### TURN BACK ON AFTER DEBUGGING ###
+#orglist = sorted(orglist)
 
 #print(orglist)
 
-popmaster = populatemaster(orglist)
+
+### TURN BACK ON AFTER DEBUGGING ###
+#popmaster = populatemaster(orglist)
 
 
 
@@ -284,6 +294,7 @@ def scrapetypes(poplist):
 			for organism in poplist:
 				if organism.truename in line:
 					organism.type = line.split('\t')[5]
+	return poplist
 
 		# Note: Column 5 in Eukaryotes contains the "type" (Linnaean Class) of organism
 		#typeslist.append(line.split('\t')[5])
@@ -295,7 +306,9 @@ def scrapetypes(poplist):
 		#if m is None:
 			#truemaster.add(org_line)
 
-scrapetypes(popmaster)
+
+### TURN BACK ON AFTER DEBUGGING ###
+#scrapetypes(popmaster)
 
 
 #for organism in popmaster:
@@ -375,11 +388,12 @@ def givetype(poplist):
 
 	return holderlist
 
-	
+### TURN BOTH BACK ON AFTER DEBUGGING ###
+
 # Actively generates game types for the organisms
-popmaster = givetype(popmaster)
+#popmaster = givetype(popmaster)
 
 # Actively shuffles ciphered names for all the organisms into place
-popmaster = shuffleboth(popmaster)
+#popmaster = shuffleboth(popmaster)
 
 

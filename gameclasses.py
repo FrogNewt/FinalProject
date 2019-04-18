@@ -4,23 +4,79 @@ import sys
 import os
 import re
 import pickle
-from organisms import popmaster
+import organisms
 from shufflecipher import *
 
 
-def shufflebegin(poplist):
-	for organism in poplist:
-		organism.name = organism.meganame
 
-shufflebegin(popmaster)
+
+def begingame():
+		welcome = input("Welcome back!  Would you like to start a new game or load an existing game? ")
+		if "n" in welcome.lower():
+			popmain.shufflebegin()
+			newplayer = Player()
+			return newplayer
+		elif "l" in welcome.lower():
+			path = "Saves/"
+			filelist = []
+			for item in os.listdir(path):
+					if item.endswith(".pickle"):
+						filelist.append(item[:-7])
+			if filelist:
+				while True:
+					print("These are the available files: ")
+					for item in filelist:
+						print(item)
+					choosefile = input("What's your filename? (Give the exact filename!) ")
+					if choosefile in filelist:
+						truepath = os.path.join("Saves", choosefile+".pickle")
+						with open(truepath, 'rb') as handle:
+							newplayer = pickle.load(handle)
+							return newplayer
+					else:
+						print("I can't find that file!")
+			else:
+				print("There are no saved files--starting a new game!")
+				newplayer = Player()
+				return newplayer
+
+def choosenext(self):
+	while True:
+		print("What would you like to do next?  You can choose from any of these:")
+		for key in self.optionlist.keys():
+			print(key.title())
+		usrinput = input("")
+		for option in self.optionlist.keys():
+			if (usrinput.lower() in option):
+				self.optionlist[option]()
+
+def shufflebegin(poplist):
+	opened = organisms.openitup()
+	popmaster = organisms.shuffleboth(organisms.givetype(organisms.scrapetypes(organisms.populatemaster(opened))))
+	[print(thing.name, thing.type) for thing in popmaster]
+
+	for organism in popmaster:
+		organism.name = organism.meganame
+	return popmaster
+### TURN BACK ON AFTER DEBUGGING ###
+#shufflebegin(popmaster)
 
 
 # Creates an object in-game with just a name (mostly exists just to allow for the cultivation of new fixed elements later)
+class Population(object):
+	def __init__(self):
+		self.name = "Population Master"
+		self.popmaster = []
+	def shufflebegin(self, poplist = ""):
+		opened = organisms.openitup()
+		self.popmaster = organisms.shuffleboth(organisms.givetype(organisms.scrapetypes(organisms.populatemaster(opened))))
+		[print(thing.name, thing.type) for thing in self.popmaster]
+
 class gameObject(object):
 	def __init__(self):
 		self.name = name
 
-
+# Anything alive gets this class
 class livingThing(gameObject):
 	def __init__(self, name="Living Thing", HP = 1):
 		self.name = name
@@ -28,11 +84,7 @@ class livingThing(gameObject):
 		self.alive = True
 		self.safe = True
 
-# A dummy organism to be used for testing
-trash = livingThing()
-trash.name = "Piece of Trash"
-trash.type = "...true piece of garbage"
-
+# A class that represents anything that can take action
 class Actor(livingThing):
 	def __init__(self, name, HP = 0, MP = 0):
 		self.name = name
@@ -40,6 +92,7 @@ class Actor(livingThing):
 		self.alive = True
 		self.safe = True
 
+# Captures all actions and abilities unique to the player
 class Player(Actor):
 	def __init__(self, name = "Unknown"):
 		self.name = name
@@ -88,8 +141,9 @@ class Player(Actor):
 
 	
 	
+
 	# Attempts to capture the current target
-	def capture(self, organism = trash):
+	def capture(self, organism):
 		self.bestiary.append(organism)
 		print("You've captured a wild {0}--it looks like it might be a {1}!".format(organism.name, organism.type))
 		print(self.bestiary)
@@ -204,7 +258,7 @@ class Player(Actor):
 
 # Used to print out all animals and their shuffled names for debugging use
 	def printanimals(self):
-		for animal in popmaster:
+		for animal in popmain.popmaster:
 			print("Current Name:" + animal.name + "\n", "True Name: " + animal.truename + "\n", "Mega-Shuffled Name: " + animal.meganame + "\n","Inter-Shuffled Name: " + animal.intername + "\n", "Type: " + animal.type + "\n")
 
 
@@ -246,7 +300,7 @@ class Player(Actor):
 
 	
 
-
+popmain = Population()
 
 
 
