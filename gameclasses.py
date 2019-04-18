@@ -12,13 +12,14 @@ from environments import *
 
 
 def begingame():
+	while True:	
 		welcome = input("Welcome back!  Would you like to start a new game or load an existing game? ")
 		if "n" in welcome.lower():
 			popmain.shufflebegin()
 			newplayer = Player()
 			newplayer.popmaster = popmain.popmaster
 			smalllist = bog.genorgs(newplayer)
-			biggerlist = bog.assignstats(newplayer)
+			biggerlist = bog.assignstats(smalllist)
 			for org in smalllist:
 				for stat in org.stats:
 					print(org.name, org.type, stat, org.stats[stat])
@@ -47,6 +48,8 @@ def begingame():
 				newplayer = Player()
 				popmain.shufflebegin()
 				return newplayer
+		else:
+			print("Whoops--try again!")
 
 def choosenext(self):
 	while True:
@@ -122,6 +125,12 @@ class Player(Actor):
 			"check my exp" : self.checkexp,
 			"quit game" : self.quitsave
 		}
+	# Lists the possible environments available
+		self.envlist = {
+		"starting area" : startArea,
+		"bog" : Bog,
+		"swamp" : Swamp,
+		}
 
 	# Stuff the player has
 		self.inventory = []
@@ -163,7 +172,26 @@ class Player(Actor):
 
 	# Go exploring in the world!
 	def explore(self):
-		envchoice = input("Great!  Where would you like to go?")
+		currentenv = ""
+		for env in self.envlist:
+			print(env.title())
+		print("Great!  Where would you like to go? It can be anywhere listed above!")
+		userinput = input("")
+		for env in self.envlist.keys():
+			if userinput in env:
+				currentenv = self.envlist[env]()
+				break
+		
+		currentlist = currentenv.genorgs(self)
+		currentenv.occupants = currentenv.assignstats(currentlist)
+		print("It looks like you've made it to {0}!".format(currentenv.name))
+		print("You can see the following, here:")
+		for occupant in currentenv.occupants:
+			print("Name: " + occupant.name, "\n" + "Type: " + occupant.type)
+			for stat in occupant.stats.keys():
+				print("\t" + str(stat) + " " + str(occupant.stats[stat]))
+
+
 		
 
 	# General error message

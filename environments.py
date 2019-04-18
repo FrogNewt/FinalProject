@@ -47,6 +47,7 @@ class basicEnv(object):
 		self.name = "A basic environment"
 		self.difficulty = 1
 		self.animalnum = 10
+		self.occupants = []
 
 class aquaEnv(basicEnv):
 	def __init__(self):
@@ -70,9 +71,9 @@ class aquaEnv(basicEnv):
 				
 		return pickedlist
 
-	def assignstats(self, player):
+	def assignstats(self, genlist):
 		statorgs = []
-		for org in player.popmaster:
+		for org in genlist:
 			if org not in statorgs:
 				statorgs.append(org)
 				for stat in org.stats.keys():
