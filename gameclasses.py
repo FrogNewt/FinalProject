@@ -6,6 +6,7 @@ import re
 import pickle
 import organisms
 from shufflecipher import *
+from environments import *
 
 
 
@@ -281,8 +282,15 @@ class Player(Actor):
 					pickle.dump(self, handle)
 					print("Game Saved to default!")
 			elif userinput:	
-				os.makedir('SaveFiles')
-				with open(userinput+'.pickle', 'wb') as handle:
+				outdir = os.path.join(os.path.curdir, "Saves")
+				print(outdir)
+				if not os.path.exists(outdir):
+					os.mkdir(outdir)
+				# os.makedirs("my_folder1")
+				path = os.path.join(outdir, userinput+".pickle")
+				print(path)
+				print("wolverine")
+				with open(path, 'wb') as handle:
 					pickle.dump(self, handle)
 					print("Game Saved!")
 		else:
@@ -305,7 +313,18 @@ popmain = Population()
 
 
 
+"""
+startarea = startArea()
 
-	
+bog = Bog()
+
+startorgs = genorgs(startarea, poppop)
+
+bogorgs = genorgs(bog, poppop)
+
+newlist = assignstats(startarea, startorgs)
+
+biggerlist = assignstats(bog, bogorgs)
+	"""
 
 		
