@@ -17,6 +17,11 @@ def begingame():
 			popmain.shufflebegin()
 			newplayer = Player()
 			newplayer.popmaster = popmain.popmaster
+			smalllist = bog.genorgs(newplayer)
+			biggerlist = bog.assignstats(newplayer)
+			for org in smalllist:
+				for stat in org.stats:
+					print(org.name, org.type, stat, org.stats[stat])
 			return newplayer
 		elif "l" in welcome.lower():
 			path = "Saves/"

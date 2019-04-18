@@ -48,12 +48,38 @@ class basicEnv(object):
 		self.difficulty = 1
 		self.animalnum = 10
 
-class aquaEnv(object):
+class aquaEnv(basicEnv):
 	def __init__(self):
 		self.name = "A basic aquatic environment"
 		self.difficulty = 1
 		self.animalnum = 10
 		self.hasaquatics = True
+
+	def genorgs(self, player):
+		templist = []
+		pickedlist = []
+		newnum = 0
+		# You'll want to use "choice" here from the builtin random module; choose(sequence) will pick something randomly from a list
+		# This can be amended to operate within a range.
+		for org in player.popmaster:
+			if org.mobile == True:
+				templist.append(org)
+		for i in range(self.animalnum):
+			newchoice = random.choice(templist)
+			pickedlist.append(newchoice)
+				
+		return pickedlist
+
+	def assignstats(self, player):
+		statorgs = []
+		for org in player.popmaster:
+			if org not in statorgs:
+				statorgs.append(org)
+				for stat in org.stats.keys():
+					org.stats[stat] = org.stats[stat] * (random.randint((self.difficulty-3 if (self.difficulty-2 > 0) else 1), self.difficulty))
+			if org.power:
+				org.poweron()
+		return statorgs
 
 class startArea(basicEnv):
 	def __init__(self):
