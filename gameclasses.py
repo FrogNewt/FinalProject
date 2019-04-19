@@ -15,14 +15,10 @@ def begingame():
 	while True:	
 		welcome = input("Welcome back!  Would you like to start a new game or load an existing game? ")
 		if "n" in welcome.lower():
+			print("Please hold--we're shuffling all your organisms into the game!")
 			popmain.shufflebegin()
 			newplayer = Player()
 			newplayer.popmaster = popmain.popmaster
-			smalllist = bog.genorgs(newplayer)
-			biggerlist = bog.assignstats(smalllist)
-			for org in smalllist:
-				for stat in org.stats:
-					print(org.name, org.type, stat, org.stats[stat])
 			return newplayer
 		elif "l" in welcome.lower():
 			path = "Saves/"
@@ -64,7 +60,7 @@ def choosenext(self):
 def shufflebegin(poplist):
 	opened = organisms.openitup()
 	popmaster = organisms.shuffleboth(organisms.givetype(organisms.scrapetypes(organisms.populatemaster(opened))))
-	[print(thing.name, thing.type) for thing in popmaster]
+	
 
 	for organism in popmaster:
 		organism.name = organism.meganame
@@ -81,7 +77,6 @@ class Population(object):
 	def shufflebegin(self, poplist = ""):
 		opened = organisms.openitup()
 		self.popmaster = organisms.shuffleboth(organisms.givetype(organisms.scrapetypes(organisms.populatemaster(opened))))
-		[print(thing.name, thing.type) for thing in self.popmaster]
 
 class gameObject(object):
 	def __init__(self):
@@ -106,6 +101,7 @@ class Actor(livingThing):
 # Captures all actions and abilities unique to the player
 class Player(Actor):
 	def __init__(self, name = "Unknown"):
+	# Fundamentals of the player
 		self.name = name
 		self.popmaster = []
 		
@@ -121,15 +117,25 @@ class Player(Actor):
 			"[demo] print all animals" : self.printanimals,
 			"play the game" : self.fourohfour,
 			"capture" : self.capture,
-			"go exploring" : self.explore,
+			"check nature log" : self.checklog,
+			"explore a new environment" : self.explorenew,
+			"explore my current environment" : self.explorecurrent,
 			"check my exp" : self.checkexp,
 			"quit game" : self.quitsave
 		}
 	# Lists the possible environments available
 		self.envlist = {
-		"starting area" : startArea,
-		"bog" : Bog,
-		"swamp" : Swamp,
+			"starting area" : startArea,
+			"bog" : Bog,
+			"swamp" : Swamp,
+		}
+
+	# Lists the options available to a player within a given environment
+		self.envoptions = {
+			"sit patiently and wait to be approached" : self.sit,
+			"go out and carefully look for organisms" : self.look,
+			"go bounding through the environment" : self.bound,
+			"go back" : self.goback
 		}
 
 	# Stuff the player has
@@ -137,31 +143,20 @@ class Player(Actor):
 		self.gold = 0
 		self.equipment = []
 		self.bestiary = []
-
-	#  Now-defunct mechanism for beginning the game
-	#def opener(self):
-	#	print("Hi, and welcome!")
-	#	i = 0
-	#	while i==0:
-	#		print("What would you like to do first? (You can choose from these things: ")
-	#		for key in self.optionlist.keys():
-	#			print(key.title())
-	#		
-	#		newinput = input("")
-	#		newinput = newinput.lower()
-	#
-	#		for thing in self.optionlist.keys():
-	#			if newinput in thing:
-	#				self.optionlist[thing]()
-	#				i += 1
-	#				break
-
-
+		self.naturelog = []
 	
+	# Things the player may need to "hold" in order to advance the game
+		self.currentenv = ""
+		self.currentoccupants = []
+		self.target = []
+		self.brokenloop = True
 	
+
+	def bound(self):
+		print("You go bounding after something!")
 
 	# Attempts to capture the current target
-	def capture(self, organism):
+	def capture(self):
 		self.bestiary.append(organism)
 		print("You've captured a wild {0}--it looks like it might be a {1}!".format(organism.name, organism.type))
 		print(self.bestiary)
@@ -170,26 +165,75 @@ class Player(Actor):
 	def checkexp(self):
 		print(self.expdict)
 
+	def checklog(self):
+		if self.log:
+			for element in self.log:
+				print(element.name)
+		else:
+			print("Your nature log is empty--go find something!")
+		
+	# Allows you to engage with your current environment in different ways!
+	def explorecurrent(self):
+		self.brokenloop = False
+		if self.currentenv:
+			while self.brokenloop == False:
+				print("You're currently in {0}.  What would you like to do?  You can: ".format(self.currentenv.name))
+				for choice in self.envoptions.keys():
+					print("\t" + choice)
+				userinput = input("")
+				goahead = False
+				for choice in self.envoptions.keys():
+					if userinput in choice:
+						goahead = True
+				if goahead == True:
+					for choice in self.envoptions.keys():
+						if userinput in choice:
+							self.envoptions[choice]()
+							break
+				else:
+					print("I didn't get that--try writing the choice exactly as it appears!")
+
+				
+
+		else:
+			print("Ooops--you haven't chosen an environment to start with, yet!  Better go back and pick a new one, first.")
+			input("")
+
+
 	# Go exploring in the world!
-	def explore(self):
-		currentenv = ""
+	def explorenew(self):
+		while self.currentenv:
+			print("Are you sure you want to leave {0}?".format(self.currentenv.name))
+			userinput = input("")
+			if "y" in userinput:
+				break
+			elif "n":
+				return
+			else:
+				print("I didn't get that--try again!")
 		for env in self.envlist:
 			print(env.title())
+		self.currentenv = ""
 		print("Great!  Where would you like to go? It can be anywhere listed above!")
-		userinput = input("")
-		for env in self.envlist.keys():
-			if userinput in env:
-				currentenv = self.envlist[env]()
+		while True:
+			userinput = input("")
+			if userinput.lower() in self.envlist.keys():
+				for env in self.envlist.keys():
+					if userinput.lower() in env:
+						self.currentenv = self.envlist[env]()
 				break
+			else:
+				print("I didn't get that--could you try again?")
 		
-		currentlist = currentenv.genorgs(self)
-		currentenv.occupants = currentenv.assignstats(currentlist)
-		print("It looks like you've made it to {0}!".format(currentenv.name))
+		currentlist = self.currentenv.genorgs(self)
+		self.currentenv.occupants = self.currentenv.assignstats(currentlist)
+		print("It looks like you've made it to {0}!".format(self.currentenv.name))
 		print("You can see the following, here:")
-		for occupant in currentenv.occupants:
+		for occupant in self.currentenv.occupants:
 			print("Name: " + occupant.name, "\n" + "Type: " + occupant.type)
 			for stat in occupant.stats.keys():
 				print("\t" + str(stat) + " " + str(occupant.stats[stat]))
+
 
 
 		
@@ -292,7 +336,11 @@ class Player(Actor):
 			if fullbreak == True:
 				break
 
+	def goback(self):
+		self.brokenloop = True
 
+	def look(self):
+		print("You go looking for things in a reasonable way.")
 # Used to print out all animals and their shuffled names for debugging use
 	def printanimals(self):
 		for animal in self.popmaster:
@@ -307,31 +355,28 @@ class Player(Actor):
 			userinput = input("")
 			if not userinput:
 				outdir = os.path.join(os.path.curdir, "Saves")
-				print(outdir)
 				if not os.path.exists(outdir):
 					os.mkdir(outdir)
 				# os.makedirs("my_folder1")
 				path = os.path.join(outdir, namedfile+".pickle")
-				print(path)
-				print("wolverine")
 				
 				with open(path, 'wb') as handle:
 					pickle.dump(self, handle)
 					print("Game Saved to default!")
 			elif userinput:	
 				outdir = os.path.join(os.path.curdir, "Saves")
-				print(outdir)
 				if not os.path.exists(outdir):
 					os.mkdir(outdir)
 				# os.makedirs("my_folder1")
 				path = os.path.join(outdir, userinput+".pickle")
-				print(path)
-				print("wolverine")
 				with open(path, 'wb') as handle:
 					pickle.dump(self, handle)
 					print("Game Saved!")
 		else:
 			print("Game not saved!")
+
+	def sit(self):
+		print("You sit and wait for something to approach you.")
 
 # Verifies that the user wants to quit and offers to save the game
 	def quitsave(self, namedfile="newgame1"):
