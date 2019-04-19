@@ -5,6 +5,7 @@ import os
 import re
 import pickle
 import organisms
+import random
 from shufflecipher import *
 from environments import *
 
@@ -105,6 +106,11 @@ class Player(Actor):
 		self.name = name
 		self.popmaster = []
 		
+	#Player Stats
+		self.HP = 10
+		self.strength = 1
+		self.luck = 1
+
 	# Links categories and related activities
 		self.activitydict = {"fitness" : {"walk" : 5, "run" : 10}, "intellect" : {}, "intellect" : {}, "happiness" : {}}
 
@@ -146,11 +152,20 @@ class Player(Actor):
 		self.naturelog = []
 	
 	# Things the player may need to "hold" in order to advance the game
+		self.randomnum = 0
 		self.currentenv = ""
 		self.currentoccupants = []
 		self.target = []
 		self.brokenloop = True
+		self.bounded = False
+		self.sat = False
+		self.looked = False
+		self.sitnum = 0
 	
+	def addtolog(self):
+		if self.target not in self.naturelog:
+			print("{0} added to your nature log!".format(self.target.name))
+			self.naturelog.append(self.target)
 
 	def bound(self):
 		print("You go bounding after something!")
@@ -166,11 +181,15 @@ class Player(Actor):
 		print(self.expdict)
 
 	def checklog(self):
-		if self.log:
-			for element in self.log:
-				print(element.name)
+		if self.naturelog:
+			print("\n ### NATURE LOG ### ")
+			for element in self.naturelog:
+				print("Shuffled-name: " + "\t" + element.name)
+				print("Type: " + element.type)
+			print("\n")
 		else:
 			print("Your nature log is empty--go find something!")
+			input("")
 		
 	# Allows you to engage with your current environment in different ways!
 	def explorecurrent(self):
@@ -229,10 +248,13 @@ class Player(Actor):
 		self.currentenv.occupants = self.currentenv.assignstats(currentlist)
 		print("It looks like you've made it to {0}!".format(self.currentenv.name))
 		print("You can see the following, here:")
+		print(self.currentenv.occupants)
 		for occupant in self.currentenv.occupants:
 			print("Name: " + occupant.name, "\n" + "Type: " + occupant.type)
 			for stat in occupant.stats.keys():
 				print("\t" + str(stat) + " " + str(occupant.stats[stat]))
+		self.explorecurrent()
+
 
 
 
@@ -376,7 +398,38 @@ class Player(Actor):
 			print("Game not saved!")
 
 	def sit(self):
+		for org in self.currentenv.occupants:
+			print(org.name, org.type)
+			for stat in org.stats.keys():
+				print(stat, org.stats[stat])
+		def makerandom(self):
+			self.randomnum = random.randint(0, len(self.currentenv.occupants)-1)
+		def makesitnum(self):
+			self.sitnum = random.randint(1,self.luck*2)
+		self.target = ""
+		chosen = False
 		print("You sit and wait for something to approach you.")
+		input("(Press any key to find out if something comes near!)")
+		makesitnum(self)
+		makerandom(self)
+		occupant = self.currentenv.occupants[self.randomnum]
+		if (occupant.skit > self.sitnum):
+			chosen = False
+		elif (occupant.skit < self.sitnum):
+			chosen = True
+		if chosen == True:
+			self.target = occupant
+			### ADD THIS IN TO THE ENCOUNTER WITH THE ORGANISM BECAUSE IT WAS ENCOUNTERED SITTING ###
+
+			#for stat in occupant.stats:
+			#	occupant.stats[stat] = occupant.stats[stat]//2
+			print("A wild {1} cautiously appears--it looks like a {0}!".format(self.target.name, self.target.type))
+			self.addtolog()
+		elif chosen == False:
+			print("...nothing.  Looks like you'll have to try again.")
+
+
+
 
 # Verifies that the user wants to quit and offers to save the game
 	def quitsave(self, namedfile="newgame1"):
@@ -388,6 +441,7 @@ class Player(Actor):
 			else:
 				pass
 
+
 	
 
 popmain = Population()
@@ -395,10 +449,6 @@ popmain = Population()
 
 
 
-
-startarea = startArea()
-
-bog = Bog()
 
 #startorgs = genorgs(startarea, poppop)
 
