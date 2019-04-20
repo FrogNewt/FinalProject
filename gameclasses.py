@@ -403,17 +403,27 @@ class Player(Actor):
 	def getactivities(self):
 		def fixedactivities(self):
 			fullbreak = False
+			activitycomplete = False
+			activitygiven = False
 			while True:
 				print("You're on fixed!")
 				print(self.expdict)
 				greeting = print("What did you do, today? (You can also type 'list' to see the activities available or type 'quit' to quit!")
 				activity = input("")
+				if activity:
+					activitygiven = True
 				if "quit" in activity:
 					self.quitsave()
 				count = 0
 				
+				if "list" in activity.lower():
+					for category in self.activitydict.keys():
+						print(category.capitalize())
+						for action in self.activitydict[category].keys():
+							print("\t"+action.capitalize()+":"+" " +str(self.activitydict[category][action]))
+
 				# Determines whether or not the activity has been done before
-				while True:
+				if activitygiven:
 					for category in self.activitydict.keys():
 						if activity in self.activitydict[category]:
 							count += 1
@@ -421,44 +431,10 @@ class Player(Actor):
 							current = self.activitydict[category][activity]
 							print("{0} experience points have been added to {1}!".format(current, category))
 							self.expdict[category] += current
+							activitycomplete = True
 							break
-					
-					# Indicates that the activity hasn't been done before
-					if count == 0:
-						# Assigns a quantity of experience points to your activity
-						goodexp = False
-						print("That's a new one--how many experience points is it worth?  (Give a number between 1 and 50!)")
-						while goodexp == False:
-							while True:
-								activityexp = input("")
-								try:
-									activityexpint = int(activityexp)
-									break
-								except ValueError:
-									print("Could not convert data to an integer--give a number between 1 and 50.")
-							if (activityexpint > 50) | (activityexpint < 1):
-								print("Ooops--that number won't work!  Choose an amount of exp between 1 and 50.")
-							else:
-								goodexp = True
-						while True:
-							for category in self.expdict.keys():
-								print(category.title())
-							print("To which category should I assign that?  You can assign it to any of the above categories:\n")
-							catchoice = input("")
-							catchoice = catchoice.lower()
-							if catchoice in self.expdict.keys():
-								self.expdict[catchoice] += activityexpint
-								print("{0} exp added to {1}!".format(activityexpint, catchoice))
-								self.activitydict[catchoice][activity] = activityexpint
-								break
-							else:
-								print("Ooops--that one didn't register.  Try entering it again!")
-						
-						while goodexp == False:
-							activityexp = input("")
-
-						self.activitydict[catchoice.lower()][activity] = activityexpint
-						
+				
+				if activitycomplete == True:
 					print("One more activity?")
 					endinput = input("")
 					if "quit" in endinput:
@@ -469,7 +445,6 @@ class Player(Actor):
 
 						# Prompts user to save the game
 						self.save()
-
 						break
 					
 					# Returns to original question about activities (what did you do, today?)
@@ -478,6 +453,8 @@ class Player(Actor):
 
 				if fullbreak == True:
 					break
+
+
 		def flexactivities(self):
 			fullbreak = False
 			print("You're on flex!")
