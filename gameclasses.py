@@ -13,44 +13,53 @@ from environments import *
 
 
 def begingame():
+	def start():
+		print("Please hold--we're shuffling all your organisms into the game!\n")
+		popmain.shufflebegin()
+		newplayer = Player()
+		print("Hey--what's your name?")
+		userinput = input("")
+		newplayer.name = userinput
+		print("######################################################################")
+		print("Hi {0}!".format(newplayer.name))
+		newplayer.popmaster = popmain.popmaster
+		print("Oh--before we get started, we should pick a game mode!")
+		input("")
+		print("You can choose between 'Fixed' and 'Flex' modes:")
+		input("")
+		print("\t'Fixed' (default) comes pre-loaded with common daily goals.")
+		input("")
+		print("\t'Flex' mode allows you to choose and customize your own goals (recommended for people who trust themselves not to cheat!)")
+		input("")
+		gameready = False
+		while gameready == False:
+			print("What would you prefer? (type 'flex' or 'fixed')")
+			flexchoice = input("")
+			if "l" in flexchoice.lower():
+				newplayer.fixed = False
+				gameready = True
+			elif "d" in flexchoice.lower():
+				newplayer.fixed = True
+				gameready = True
+			else:
+				print("I didn't get your choice--can you try again? (type either 'fixed' or 'flex'")
+		print("Got it--we're ready to go! (Press any key to continue)")
+		input("")
+		return newplayer
+
 	while True:	
 		print("######################################################################")
 		welcome = input("Welcome back!  Would you like to start a new game or load an existing game? ")
 		if "n" in welcome.lower():
-			print("Please hold--we're shuffling all your organisms into the game!\n")
-			popmain.shufflebegin()
-			newplayer = Player()
-			print("Hey--what's your name?")
-			userinput = input("")
-			newplayer.name = userinput
-			print("######################################################################")
-			print("Hi {0}!".format(newplayer.name))
-			newplayer.popmaster = popmain.popmaster
-			print("Oh--before we get started, we should pick a game mode!")
-			input("")
-			print("You can choose between 'Fixed' and 'Flex' modes:")
-			input("")
-			print("\t'Fixed' (default) comes pre-loaded with common daily goals.")
-			input("")
-			print("\t'Flex' mode allows you to choose and customize your own goals (recommended for people who trust themselves not to cheat!)")			gameready = False
-			while gameready == False:
-				flexchoice = input("What would you prefer? (type 'flex' or 'fixed')")
-				if "l" in flexchoice.lower():
-					newplayer.fixed = False
-					gameready = True
-				elif "d" in flexchoice.lower():
-					newplayer.fixed = True
-					gameready = True
-				else:
-					print("I didn't get your choice--can you try again? (type either 'fixed' or 'flex'")
-			print("Got it--we're ready to go!")
-			return newplayer
+			return start()
+
 		elif "l" in welcome.lower():
 			path = "Saves/"
 			filelist = []
-			for item in os.listdir(path):
-					if item.endswith(".pickle"):
-						filelist.append(item[:-7])
+			if os.path.exists(path):
+				for item in os.listdir(path):
+						if item.endswith(".pickle"):
+							filelist.append(item[:-7])
 			if filelist:
 				while True:
 					print("######################################################################")
@@ -66,10 +75,9 @@ def begingame():
 					else:
 						print("I can't find that file!")
 			else:
+				print("######################################################################")
 				print("There are no saved files--starting a new game!")
-				newplayer = Player()
-				popmain.shufflebegin()
-				return newplayer
+				return start()
 		else:
 			print("Whoops--try again!")
 
@@ -343,7 +351,7 @@ class Player(Actor):
 			while self.brokenloop == False:
 				print("You're currently in {0}.  What would you like to do?  You can: ".format(self.currentenv.name))
 				for choice in self.envoptions.keys():
-					print("\t" + choice)
+					print("\t" + choice.capitalize())
 				userinput = input("")
 				goahead = False
 				for choice in self.envoptions.keys():
@@ -448,7 +456,7 @@ class Player(Actor):
 							print("######################################################################")
 							print("Got it!")
 							current = self.activitydict[category][activity]
-							print("{0} experience points have been added to {1}!".format(current, category))
+							print("You've added {0} experience points to {1}!".format(current, category))
 							self.expdict[category] += current
 							activitycomplete = True
 							break
@@ -483,7 +491,6 @@ class Player(Actor):
 		def flexactivities(self):
 			print("You're in flex!")
 			fullbreak = False
-			print("You're on flex!")
 			while True:
 				print(self.expdict)
 				greeting = print("What did you do, today? (or you can 'quit'!)")
@@ -499,7 +506,7 @@ class Player(Actor):
 							count += 1
 							print("You've done that one before!")
 							current = self.activitydict[category][activity]
-							print("{0} experience points have been added to {1}!".format(current, category))
+							print("You've added {0} experience points to {1}!".format(current, category))
 							self.expdict[category] += current
 							break
 					
