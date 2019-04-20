@@ -8,12 +8,19 @@ import organisms
 import random
 from shufflecipher import *
 from environments import *
+import pygame
+import time
+
 
 
 
 
 def begingame():
 	def start():
+		#pygame.mixer.init()
+		#pygame.mixer.music.load('woodfrog.wav')
+		#pygame.mixer.music.play()
+
 		print("Please hold--we're shuffling all your organisms into the game!\n")
 		popmain.shufflebegin()
 		newplayer = Player()
@@ -149,8 +156,18 @@ class Player(Actor):
 		self.intellect = 1
 		self.naturalism = 1
 		self.happiness = 1
-		self.luck = 2
+		self.luck = 1
 		self.fixed = True
+		self.soundon = True
+
+		self.stats = {
+		"HP" : self.HP,
+		"Max HP" : self.maxHP,
+		"Strength" : self.strength,
+		"Intellect" : self.intellect,
+		"Naturalism" : self.naturalism,
+		"Luck" : self.luck
+		}
 	# Links categories and related activities ("FLEX" version)
 		
 		if self.fixed == False:
@@ -172,7 +189,8 @@ class Player(Actor):
 		self.activitydict
 
 	# Aggregates experience by category
-		self.expdict = {"fitness" : 0, "intellect" : 0, "naturalism": 0, "happiness" : 0, "game" : 0}
+		self.expdict = {"fitness" : 0, "intellect" : 0, "naturalism": 0, "happiness" : 0}
+		self.gameexp = 0
 
 	# Creates list of all options for a player to choose
 		self.optionlist = {
@@ -222,6 +240,7 @@ class Player(Actor):
 		self.boundnum = 0
 		self.damage = 0
 		self.safe = True
+		self.previoustarget = ""
 	
 	def addtolog(self):
 		if self.target not in self.naturelog:
@@ -231,7 +250,7 @@ class Player(Actor):
 
 	def attack(self):
 		def setdamage(self):
-			self.damage = random.randint(self.strength, self.strength + self.luck)
+			self.damage = random.randint(self.stats["Strength"], self.stats["Strength"] + self.stats["Luck"])
 		setdamage(self)
 		self.target.stats["HP"] -= self.damage
 		print("{0} attacks the {1} for {2}!".format(self.name, self.target.name, self.damage))
@@ -245,20 +264,19 @@ class Player(Actor):
 			self.randomnum = random.randint(0, len(self.currentenv.occupants)-1)
 		
 		def makeboundnum(self):
-			self.boundnum = random.randint(1,self.luck)
+			self.boundnum = random.randint(1,self.stats["Luck"])
 		
 		#Checks whether or not the target gets super-strength as a result of your intrusion
 		def checkberserk(self):
 			print("Berserk test")
 			if self.target.stats["Luck"] > self.boundnum:
 				self.target.berserk = True
-			
-			self.target.berserk
+		
 			print("My boundnum:" + str(self.boundnum))
 			print("Organism's luck: " + str(self.target.stats["Luck"]))
 
 			if self.target.berserk == True:
-				self.target.strength = self.target.stats["Strength"] * 2
+				self.target.stats["Strength"] = self.target.stats["Strength"] * 2
 				print("(And it looks PISSED!)")
 
 		self.target = ""
@@ -292,6 +310,12 @@ class Player(Actor):
 	def checkexp(self):
 		print(self.expdict)
 
+	def gameexpdump(self):
+		if self.gameexp >= 1000:
+			for exptype in self.expdict.keys():
+				self.expdict[exptype] += 1
+			self.gameexp -= 1000
+
 	def checklog(self):
 		if self.naturelog:
 			print("\n ### NATURE LOG ### ")
@@ -304,7 +328,7 @@ class Player(Actor):
 			input("")
 	
 	def checkHP(self):
-		print("Your HP: " + str(self.HP))
+		print("Your HP: " + str(self.stats["HP"]))
 		if self.target:
 			print("Opponent HP: " + str(self.target.stats["HP"]))
 
@@ -324,8 +348,9 @@ class Player(Actor):
 		# Actions the enemy can take
 
 
-		while (self.safe == False) and (self.HP > 0) and (self.target.safe == False) and (self.target.stats["HP"] > 0):
+		while (self.safe == False) and (self.stats["HP"] > 0) and (self.target.safe == False) and (self.target.stats["HP"] > 0):
 			print("######################################################################")
+			self.playsound()
 			print("You're facing-off against a {0}!  What do you want to do?".format(self.target.name))
 			print("You can: ")
 			for option in encoptions.keys():
@@ -334,13 +359,17 @@ class Player(Actor):
 			for key in encoptions.keys():
 				if userinput in key:
 					encoptions[key]()
-		if self.HP < 1:
+		if self.stats["HP"] < 1:
 			print("You were driven off!")
-			self.HP = self.maxHP
+			self.stats["HP"] = self.stats["Max HP"]
 		elif self.target.stats["HP"] < 1:
 			print("You drove the {0} off!".format(self.target.name))
-			self.target.stats["HP"] = self.target.maxHP
+			self.target.stats["HP"] = self.target.stats["Max HP"]
+			self.gameexp += self.target.stats["Exp"]
+			print("You've gained {0} exp!".format(self.target.stats["Exp"]))
+			self.previoustarget = self.target
 			self.target = ""
+		self.gameexpdump()
 
 
 
@@ -592,8 +621,16 @@ class Player(Actor):
 		self.target = occupant
 		# Checks to see if the player is eligible to have organisms approach
 	
-		print("A wild {1} appears--it looks like a {0}!".format(self.target.name, self.target.type))
+		print("You found something!")
 		self.addtolog()
+		self.encounter()
+
+	def playsound(self):
+		if self.soundon:
+			if self.target.sound:
+				pygame.mixer.init()
+				pygame.mixer.music.load(self.target.sound)
+				pygame.mixer.music.play()
 
 # Used to print out all animals and their shuffled names for debugging use
 	def printanimals(self):
