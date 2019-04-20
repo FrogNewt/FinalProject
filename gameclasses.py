@@ -403,11 +403,10 @@ class Player(Actor):
 	def getactivities(self):
 		def fixedactivities(self):
 			fullbreak = False
-			activitycomplete = False
 			activitygiven = False
 			while True:
-				print("You're on fixed!")
-				print(self.expdict)
+				activitycomplete = False
+				print("######################################################################")
 				greeting = print("What did you do, today? (You can also type 'list' to see the activities available or type 'quit' to quit!")
 				activity = input("")
 				if activity:
@@ -427,12 +426,19 @@ class Player(Actor):
 					for category in self.activitydict.keys():
 						if activity in self.activitydict[category]:
 							count += 1
-							print("You've done that one before!")
+							print("######################################################################")
+							print("Got it!")
 							current = self.activitydict[category][activity]
 							print("{0} experience points have been added to {1}!".format(current, category))
 							self.expdict[category] += current
 							activitycomplete = True
 							break
+					if activitycomplete == False:
+						print("######################################################################")
+						print("It doesn't look like that one's on the list--try typing it again (exactly as written).")
+						print("If you'd prefer to customize your experience more, you can always start a game in 'flex' mode!)")
+						input("")
+
 				
 				if activitycomplete == True:
 					print("One more activity?")
@@ -449,7 +455,7 @@ class Player(Actor):
 					
 					# Returns to original question about activities (what did you do, today?)
 					else:
-						break
+						pass
 
 				if fullbreak == True:
 					break
