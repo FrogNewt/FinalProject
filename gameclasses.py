@@ -16,7 +16,7 @@ def begingame():
 	while True:	
 		welcome = input("Welcome back!  Would you like to start a new game or load an existing game? ")
 		if "n" in welcome.lower():
-			print("Please hold--we're shuffling all your organisms into the game!")
+			print("Please hold--we're shuffling all your organisms into the game!\n")
 			popmain.shufflebegin()
 			newplayer = Player()
 			newplayer.popmaster = popmain.popmaster
@@ -109,6 +109,9 @@ class Player(Actor):
 	#Player Stats
 		self.HP = 10
 		self.strength = 1
+		self.intellect = 1
+		self.naturalism = 1
+		self.happiness = 1
 		self.luck = 1
 
 	# Links categories and related activities
@@ -161,6 +164,8 @@ class Player(Actor):
 		self.sat = False
 		self.looked = False
 		self.sitnum = 0
+		self.looknum = 0
+		self.boundnum = 0
 	
 	def addtolog(self):
 		if self.target not in self.naturelog:
@@ -169,6 +174,50 @@ class Player(Actor):
 
 	def bound(self):
 		print("You go bounding after something!")
+		for org in self.currentenv.occupants:
+			print(org.name, org.type)
+			for stat in org.stats.keys():
+				print(stat, org.stats[stat])
+		def makerandom(self):
+			self.randomnum = random.randint(0, len(self.currentenv.occupants)-1)
+		
+		def makeboundnum(self):
+			self.boundnum = random.randint(1,self.luck)
+		
+		#Checks whether or not the target gets super-strength as a result of your intrusion
+		def checkberserk(self):
+			print("Berserk test")
+			if self.target.luck > self.boundnum:
+				self.target.berserk = True
+			
+			self.target.berserk
+			print("My boundnum:" + str(self.boundnum))
+			print("Organism's luck: " + str(self.target.luck))
+
+			if self.target.berserk == True:
+				self.target.strength = self.target.strength * 2
+				print("(And it looks PISSED!)")
+
+		self.target = ""
+		chosen = False
+		possible = False
+		print("You bound into {0}!".format(self.currentenv.name))
+		input("(Press any key to find out what you've crashed into!)")
+		makeboundnum(self)
+		makerandom(self)
+		occupant = self.currentenv.occupants[self.randomnum]
+		self.target = occupant
+		
+		
+		
+
+		print("You've crashed into a wild {1}--and it looks like a {0}!".format(self.target.name, self.target.type))
+		
+		# Assign berserk status of target
+		checkberserk(self)
+		
+		# Add organism to nature log if yet unseen
+		self.addtolog()
 
 	# Attempts to capture the current target
 	def capture(self):
@@ -246,6 +295,10 @@ class Player(Actor):
 		
 		currentlist = self.currentenv.genorgs(self)
 		self.currentenv.occupants = self.currentenv.assignstats(currentlist)
+
+
+
+
 		print("It looks like you've made it to {0}!".format(self.currentenv.name))
 		print("You can see the following, here:")
 		print(self.currentenv.occupants)
@@ -363,6 +416,28 @@ class Player(Actor):
 
 	def look(self):
 		print("You go looking for things in a reasonable way.")
+		for org in self.currentenv.occupants:
+			print(org.name, org.type)
+			for stat in org.stats.keys():
+				print(stat, org.stats[stat])
+		def makerandom(self):
+			self.randomnum = random.randint(0, len(self.currentenv.occupants)-1)
+		def makelooknum(self):
+			self.looknum = random.randint(1,self.luck)
+		self.target = ""
+		chosen = False
+		possible = False
+		print("You advance into {0}!".format(self.currentenv.name))
+		input("(Press any key to find out what you've encountered!)")
+		makelooknum(self)
+		makerandom(self)
+		occupant = self.currentenv.occupants[self.randomnum]
+		self.target = occupant
+		# Checks to see if the player is eligible to have organisms approach
+	
+		print("A wild {1} appears--it looks like a {0}!".format(self.target.name, self.target.type))
+		self.addtolog()
+
 # Used to print out all animals and their shuffled names for debugging use
 	def printanimals(self):
 		for animal in self.popmaster:
@@ -408,25 +483,34 @@ class Player(Actor):
 			self.sitnum = random.randint(1,self.luck*2)
 		self.target = ""
 		chosen = False
+		possible = False
 		print("You sit and wait for something to approach you.")
 		input("(Press any key to find out if something comes near!)")
 		makesitnum(self)
 		makerandom(self)
 		occupant = self.currentenv.occupants[self.randomnum]
-		if (occupant.skit > self.sitnum):
-			chosen = False
-		elif (occupant.skit < self.sitnum):
-			chosen = True
-		if chosen == True:
-			self.target = occupant
-			### ADD THIS IN TO THE ENCOUNTER WITH THE ORGANISM BECAUSE IT WAS ENCOUNTERED SITTING ###
 
-			#for stat in occupant.stats:
-			#	occupant.stats[stat] = occupant.stats[stat]//2
-			print("A wild {1} cautiously appears--it looks like a {0}!".format(self.target.name, self.target.type))
-			self.addtolog()
-		elif chosen == False:
-			print("...nothing.  Looks like you'll have to try again.")
+		# Checks to see if the player is eligible to have organisms approach
+		if (self.luck*2) > self.currentenv.difficulty:
+			possible = True
+
+		if possible == True:
+			if (occupant.skit > self.sitnum):
+				chosen = False
+			elif (occupant.skit < self.sitnum):
+				chosen = True
+			if chosen == True:
+				self.target = occupant
+				### ADD THIS IN TO THE ENCOUNTER WITH THE ORGANISM BECAUSE IT WAS ENCOUNTERED SITTING ###
+
+				#for stat in occupant.stats:
+				#	occupant.stats[stat] = occupant.stats[stat]//2
+				print("A wild {1} cautiously appears--it looks like a {0}!".format(self.target.name, self.target.type))
+				self.addtolog()
+			elif chosen == False:
+				print("...nothing.  Looks like you'll have to try again.")
+		else:
+			print("It looks like you might need to level-up your \"luck\" stat before anything will approach you in this area!")
 
 
 
