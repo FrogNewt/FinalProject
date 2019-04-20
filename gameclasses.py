@@ -26,6 +26,24 @@ def begingame():
 			print("######################################################################")
 			print("Hi {0}!".format(newplayer.name))
 			newplayer.popmaster = popmain.popmaster
+			print("Oh--before we get started, we should pick a game mode!")
+			input("")
+			print("You can choose between 'Fixed' and 'Flex' modes:")
+			input("")
+			print("\t'Fixed' (default) comes pre-loaded with common daily goals.")
+			input("")
+			print("\t'Flex' mode allows you to choose and customize your own goals (recommended for people who trust themselves not to cheat!)")			gameready = False
+			while gameready == False:
+				flexchoice = input("What would you prefer? (type 'flex' or 'fixed')")
+				if "l" in flexchoice.lower():
+					newplayer.fixed = False
+					gameready = True
+				elif "d" in flexchoice.lower():
+					newplayer.fixed = True
+					gameready = True
+				else:
+					print("I didn't get your choice--can you try again? (type either 'fixed' or 'flex'")
+			print("Got it--we're ready to go!")
 			return newplayer
 		elif "l" in welcome.lower():
 			path = "Saves/"
@@ -402,6 +420,7 @@ class Player(Actor):
 	# Main method for gaining experience in the game; varies (or will vary) between flexible and fixed modes
 	def getactivities(self):
 		def fixedactivities(self):
+			print("You're in fixed!")
 			fullbreak = False
 			activitygiven = False
 			while True:
@@ -462,6 +481,7 @@ class Player(Actor):
 
 
 		def flexactivities(self):
+			print("You're in flex!")
 			fullbreak = False
 			print("You're on flex!")
 			while True:
