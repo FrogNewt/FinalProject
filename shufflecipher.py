@@ -36,8 +36,28 @@ def megacipher(organism):
 	"z" : "b"
 	}
 
+	shortname = ""
+	genus = ""
+	species = ""
+
+	temptemp = organism.truename.split(" ")
+	if len(temptemp) > 1:
+		genus = temptemp[0]
+		species = temptemp[1]
+	else:
+		shortname = temptemp[0]
+
+
+	if len(genus) > 6:
+		genus = genus[:6]
+	if len(species) > 6:
+		species = species[:6]
+	if genus and species:
+		shortname = genus + " " + species
+
+
 	megaorg = ""
-	for i in organism.truename.lower():
+	for i in shortname.lower():
 		if i.lower() in megadict.keys():
 			megaorg += megadict[i]
 		else:

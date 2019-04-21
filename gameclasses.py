@@ -108,17 +108,34 @@ def begingame():
 def choosenext(self):
 	while True:
 		print("######################################################################")
-		print("So, {0}, what would you like to do next?  You can choose from any of these:\n".format(self.name))
+		print("So, {0}, what would you like to do next?  You can choose from any of these (or 'quit'):\n".format(self.name))
 		for key in self.optionlist.keys():
 			print(key.title())
 		print("")
 		ready = False
 		usrinput = input("")
+		if 'quit' in usrinput:
+			self.quitsave()
 		for option in self.optionlist.keys():
 			if (usrinput) and (usrinput.lower() in option):
 				print("######################################################################")
-				self.optionlist[option]()
-				ready = True
+				print(option.title())
+				print("######################################################################")
+				while ready == False:
+					for key in self.optionlist[option].keys():
+						print(key.title())
+					print("What would you like to do?")
+					usrinput2 = input("")
+					print("######################################################################")
+					for key in self.optionlist[option].keys():
+						if (usrinput2.lower() in key) or (usrinput2.lower() == key):
+							if (usrinput2 == "go back") or ("go back" in usrinput2):
+								ready = True
+								break
+							else:
+								self.optionlist[option][key]()
+					
+					
 		if ready == False:
 			print("Ooops--didn't get that!")
 
@@ -183,7 +200,7 @@ class Player(Actor):
 		self.intellect = 1
 		self.naturalism = 1
 		#self.happiness = 1
-		self.luck = 1
+		self.luck = 2
 		self.fixed = True
 		self.soundon = True
 
@@ -260,30 +277,7 @@ class Player(Actor):
 
 		self.expdict = {"fitness" : 0, "intellect" : 0, "naturalism": 0, "happiness" : 0, "game" : 0}
 
-	# Creates list of all options for a player to choose
-		self.optionlist = {
-			"add new activities" : self.getactivities,
-			#"[demo] print all animals" : self.printanimals,
-			"set companion" : self.setcompanion,
-			"examine companion" : self.examinecompanion,
-			"breed organisms" : self.breed,
-			"check nursery" : self.checknursery,
-			#"play the game" : self.fourohfour,
-			#"capture" : self.capture,
-			"check stats" : self.checkstats,
-			"check inventory" : self.checkinventory,
-			"examine bestiary" : self.examinebestiary,
-			"feed companion" : self.feedcompanion,
-			"rest companion" : self.restcompanion,
-			"check resting organisms" : self.checkresting,
-			"check nature log" : self.checklog,
-			"explore a new environment" : self.explorenew,
-			"explore my current environment" : self.explorecurrent,
-			"check my exp" : self.checkexp,
-			"toggle flex" : self.toggleflex,
-			"toggle sound" : self.togglesound,
-			"quit game" : self.quitsave
-		}
+
 
 		self.orgsdict = {
 		"set companion" : self.setcompanion,
@@ -292,7 +286,9 @@ class Player(Actor):
 		"rest companion" : self.restcompanion,
 		"check resting organisms" : self.checkresting,
 		"breed organisms" : self.breed,
-		"view nursery" : self.checknursery
+		"view nursery" : self.checknursery,
+		"bestiary" : self.examinebestiary,
+		"go back" : ""
 
 		}
 
@@ -301,21 +297,52 @@ class Player(Actor):
 		"check stats" : self.checkstats,
 		"check inventory" : self.checkinventory,
 		"check my exp" : self.checkexp,
-		"check nature log" : self.checklog
+		"check nature log" : self.checklog,
+		"go back" : ""
 		}
 
 		self.exploredict = {
 		"explore a new environment" : self.explorenew,
-		"epxlore my current environment" : self.explorecurrent,
+		"explore my current environment" : self.explorecurrent,
+		"go back" : ""
 
 		}
 
 		self.settingsmenu = {
 		"toggle flex" : self.toggleflex,
-		"toggle sound" : self.togglesound
+		"toggle sound" : self.togglesound,
+		"save game" : self.save,
+		"go back" : ""
 		}
 
-
+		# Creates list of all options for a player to choose
+		self.optionlist = {
+			#"add new activities" : self.getactivities,
+			"player options" : self.playerdict,
+			"organism options" : self.orgsdict,
+			"exploration options" : self.exploredict,
+			"settings" : self.settingsmenu,
+			#"[demo] print all animals" : self.printanimals,
+			#"set companion" : self.setcompanion,
+			#"examine companion" : self.examinecompanion,
+			#"breed organisms" : self.breed,
+			#"check nursery" : self.checknursery,
+			#"play the game" : self.fourohfour,
+			#"capture" : self.capture,
+			#"check stats" : self.checkstats,
+			#"check inventory" : self.checkinventory,
+			#"examine bestiary" : self.examinebestiary,
+			#"feed companion" : self.feedcompanion,
+			#"rest companion" : self.restcompanion,
+			#"check resting organisms" : self.checkresting,
+			#"check nature log" : self.checklog,
+			#"explore a new environment" : self.explorenew,
+			#"explore my current environment" : self.explorecurrent,
+			#"check my exp" : self.checkexp,
+			#"toggle flex" : self.toggleflex,
+			#"toggle sound" : self.togglesound,
+			#"quit game" : self.quitsave
+		}
 
 	# Lists the possible environments available
 		self.envlist = {
@@ -670,6 +697,7 @@ class Player(Actor):
 			organisms.givetype(offspring)
 			newbaby = offspring[0]
 			newbaby.name = genus.capitalize() + " " + species.lower()
+			newbaby.evolvable = False
 
 
 			hybridvigor = False
@@ -829,9 +857,15 @@ class Player(Actor):
 			self.restoreHP()
 			self.expdict["game"] += self.target.stats["Exp"]
 			print("You've gained {0} exp!".format(self.target.stats["Exp"]))
+			if self.companion:
+				companionexp = self.target.stats["Exp"] // 2
+				print("{0} has gained {1} exp!".format(self.companion.name, companionexp))
+				self.companion.expgained += companionexp
 			self.previoustarget = self.target
 			self.target = ""
 		self.gameexpdump()
+		if self.companion:
+			self.companion.evolvecheck()
 
 
 

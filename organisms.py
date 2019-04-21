@@ -128,6 +128,9 @@ class Organism(livingThing):
 		self.matedtime = ""
 		self.sireID = ""
 		self.babyID = ""
+		self.resting = False
+		self.expgained = 0
+		self.evolved = 0
 
 		# Combat Stats
 		self.maxHP = 10
@@ -141,6 +144,9 @@ class Organism(livingThing):
 		self.mobile = True
 		self.gold = 1
 		self.expgiven = 1
+		self.beganrest = ""
+		self.evthreshold1 = 100
+		self.evthreshold2 = 200
 		
 
 		self.actions = [
@@ -194,6 +200,41 @@ class Organism(livingThing):
 		elif dropchance > keepchance:
 			print("{0} dropped {1}!".format(self.name, self.item.name))
 			opponent.inventory.append(self.item)
+
+	def evolvecheck(self):
+		exclude = ["Gold", "Exp", "Skittishness"]
+		def evolve1(self):
+			print("{0} is evolving...into a {1}!".format(self.name, self.intername))
+			self.name = self.intername
+			self.evolved = 1
+			for stat in self.stats.keys():
+				if stat not in exclude:
+					old = self.stats[stat]
+					self.stats[stat] *= 2
+					if stat != "HP":
+						print(stat + " " + str(old) + "->" + str(self.stats[stat]))
+		
+		def evolve2(self):
+			print("{0} is evolving...into a {1}!".format(self.name, self.truename))
+			self.name = self.truename
+			self.evolved = 2
+			for stat in self.stats.keys():
+				if stat not in exclude:
+					old = self.stats[stat]
+					self.stats[stat] *= 3
+					if stat != "HP":
+						print(stat + " " + str(old) + "->" + str(self.stats[stat]))
+		
+		if self.evolvable == True and self.evolved == 0:
+			if self.expgained > self.evthreshold1:
+				evolve1(self)
+				self.expgained -= self.evthreshold1
+
+		elif self.evolvable == True and self.evolved == 1:
+			if self.expgained > self.evthreshold2:
+				evolve2(self)
+				self.expgained -= self.evthreshold2
+
 
 
 	def genfood(self):
