@@ -183,7 +183,7 @@ class Player(Actor):
 		self.intellect = 1
 		self.naturalism = 1
 		#self.happiness = 1
-		self.luck = 50
+		self.luck = 1
 		self.fixed = True
 		self.soundon = True
 
@@ -274,12 +274,45 @@ class Player(Actor):
 			"check inventory" : self.checkinventory,
 			"examine bestiary" : self.examinebestiary,
 			"feed companion" : self.feedcompanion,
+			"rest companion" : self.restcompanion,
+			"check resting organisms" : self.checkresting,
 			"check nature log" : self.checklog,
 			"explore a new environment" : self.explorenew,
 			"explore my current environment" : self.explorecurrent,
 			"check my exp" : self.checkexp,
+			"toggle flex" : self.toggleflex,
 			"toggle sound" : self.togglesound,
 			"quit game" : self.quitsave
+		}
+
+		self.orgsdict = {
+		"set companion" : self.setcompanion,
+		"examine companion" : self.examinecompanion,
+		"feed companion" : self.feedcompanion,
+		"rest companion" : self.restcompanion,
+		"check resting organisms" : self.checkresting,
+		"breed organisms" : self.breed,
+		"view nursery" : self.checknursery
+
+		}
+
+		self.playerdict = {
+		"add new activities" : self.getactivities,
+		"check stats" : self.checkstats,
+		"check inventory" : self.checkinventory,
+		"check my exp" : self.checkexp,
+		"check nature log" : self.checklog
+		}
+
+		self.exploredict = {
+		"explore a new environment" : self.explorenew,
+		"epxlore my current environment" : self.explorecurrent,
+
+		}
+
+		self.settingsmenu = {
+		"toggle flex" : self.toggleflex,
+		"toggle sound" : self.togglesound
 		}
 
 
@@ -329,6 +362,7 @@ class Player(Actor):
 		self.previoustarget = ""
 		self.tempenemy = self
 		self.excludestats = ["Max HP", "Gold", "Exp"]
+		self.hotel = []
 
 	# For breeding organisms
 		self.dam = ""
@@ -929,12 +963,14 @@ class Player(Actor):
 			while True:
 				activitycomplete = False
 				print("######################################################################")
-				greeting = print("What did you do, today? (You can also type 'list' to see the activities available or type 'quit' to quit!")
+				greeting = print("What did you do, today? (You can also type 'list' to see the activities available or type 'leave' to move on or 'quit' (to end game)!")
 				activity = input("")
 				if activity:
 					activitygiven = True
 				if "quit" in activity:
 					self.quitsave()
+				if "leave" in activity:
+					break
 				count = 0
 				
 				if "list" in activity.lower():
@@ -987,11 +1023,12 @@ class Player(Actor):
 			print("You're in flex!")
 			fullbreak = False
 			while True:
-				print(self.expdict)
-				greeting = print("What did you do, today? (or you can 'quit'!)")
+				greeting = print("What did you do, today? (or you can 'leave' to move on or 'quit' to quit the game!)")
 				activity = input("")
 				if "quit" in activity:
 					self.quitsave()
+				elif "leave" in activity:
+					break
 				count = 0
 				
 				# Determines whether or not the activity has been done before
@@ -1220,6 +1257,29 @@ class Player(Actor):
 			print("######################################################################")
 			print("\tIt looks like you might need to level-up your \"luck\" stat before anything will approach you in this area!")
 
+	def toggleflex(self):
+		if self.fixed == True:
+			print("You're currently on fixed mode.")
+			print("Would you like to switch to flex mode?")
+			userinput = input("")
+			if "y" in userinput:
+				print("Ok!  Switched to flex mode!")
+				self.fixed = False
+			else:
+				print("Didn't switch modes--still in fixed.")
+				return
+		elif self.fixed == False:
+			print("You're currently on flex mode.")
+			print("Would you like to switch to fixed mode?")
+			userinput = input("")
+			if "y" in userinput:
+				print("If you switch to fixed mode, your existing library of activities will be lost.  Are you sure you want to switch?")
+				userinput2 = input("")
+				if "y" in userinput2:
+					print("Switched from flex to fixed!")
+					self.fixed = True
+
+
 	def togglesound(self):
 		while True:
 			print("Would you like sounds on or off?")
@@ -1234,6 +1294,59 @@ class Player(Actor):
 				return
 			else:
 				print("I didn't get that--try again!")
+
+	def restcompanion(self):
+		if self.companion:
+			print("Would you like to rest your companion?  It'll rest for at least one day, but it'll get stronger for every day it rests!")
+			userinput = input("")
+			if "y" in userinput:
+				print("Are you sure?  {0} will be unavailable until tomorrow!".format(self.companion.name))
+				userinput2 = input("")
+				if "y" in userinput2:
+					self.hotel.append(self.companion)
+					self.companion.beganrest = str(time.ctime()).split()[0]
+					self.companion.resting = True
+			else:
+				print("Ok--no problem.  Another time.")
+				input("")
+		else:
+			print("You don't have a companion to rest right now.")
+			input("")
+
+	def checkresting(self):
+		timenow = str(time.ctime()).split()[0]
+		if self.hotel:
+			print("These organisms are currently resting:")
+			for element in self.hotel:
+				print("\t" + element.name)
+				if element.beganrest != timenow:
+					element.resting = False
+		someready = False
+		for org in self.hotel:
+			if org.resting == False:
+				someready = True
+		if someready == True:
+			i = 0
+			print("The following organisms are ready for action again (but you can leave them if you want them to keep resting!)")
+			for element in self.hotel:
+				element.index = i
+				if element.resting == False:
+					print(element.name)
+					print("Index: " + element.index)
+					i += 1
+			print("Who do you want to withdraw? (Type the organism's index)")
+			userinput3 = input("")
+			for org in self.hotel:
+				if userinput3 == element.index:
+					print("You've withdrawn {0}!  It's back in the bestiary!".format(element.name))
+					for stat in element.stats.keys():
+						element.stats[stat] += 1
+					self.bestiary.append(element)
+					self.hotel.pop(self.hotel.index(element))
+
+		else:
+			print("No one's ready to wake up, yet--come back later!")
+			input("")
 
 	def restoreHP(self):
 		self.stats["HP"] = self.stats["Max HP"]
