@@ -56,6 +56,7 @@ def begingame():
 			soundinput = input("")
 			if "n" in soundinput:
 				print("Sound on!")
+				import pygame
 				newplayer.soundon = True
 				soundready = True
 			elif "f" in soundinput:
@@ -135,7 +136,13 @@ def shufflebegin(poplist):
 
 
 # Creates an object in-game with just a name (mostly exists just to allow for the cultivation of new fixed elements later)
-class Population(object):
+class gameObject(object):
+	def __init__(self):
+		self.name = name
+
+
+# Used in generating the initial population list
+class Population(gameObject):
 	def __init__(self):
 		self.name = "Population Master"
 		self.popmaster = []
@@ -143,33 +150,8 @@ class Population(object):
 		opened = organisms.openitup()
 		self.popmaster = organisms.shuffleboth(organisms.givetype(organisms.scrapetypes(organisms.populatemaster(opened))))
 
-class gameObject(object):
-	def __init__(self):
-		self.name = name
 
-class Food(gameObject):
-	def __init__(self):
-		self.quality = 1
 
-class hpFood(Food):
-	def __init__(self):
-		super().__init__()
-		self.affects = "Speed"
-
-class speedFood(Food):
-	def __init__(self):
-		super().__init__()
-		self.affects = "Speed"
-
-class strengthFood(Food):
-	def __init__(self):
-		super().__init__()
-		self.affects = "Speed"
-
-class luckFood(Food):
-	def __init__(self):
-		super().__init__()
-		self.affects = "Speed"
 
 # Anything alive gets this class
 class livingThing(gameObject):
@@ -194,7 +176,7 @@ class Player(Actor):
 		self.name = name
 		self.popmaster = []
 		
-	#Player Stats
+	# Player Stats (Unaccessed during gameplay after initialization)
 		self.maxHP = 10
 		self.HP = 10
 		self.strength = 1
@@ -205,6 +187,7 @@ class Player(Actor):
 		self.fixed = True
 		self.soundon = True
 
+	# USABLE Player stats--reference these in combat/interactions (rather than the originals)
 		self.stats = {
 		"HP" : self.HP,
 		"Max HP" : self.maxHP,
@@ -216,6 +199,7 @@ class Player(Actor):
 	# Links categories and related activities ("FLEX" version)
 		
 		if self.fixed == False:
+		# Sets categories to be used (empty) for flex mode for leveling-up
 			self.activitydict = {
 			"fitness" : {}, 
 			"intellect" : {}, 
@@ -223,12 +207,46 @@ class Player(Actor):
 			"happiness" : {}
 			}
 		elif self.fixed == True:
+		# Sets activities to be included in "fixed" mode for leveling-up
 			self.activitydict = {
-			"fitness" : {"walk" : 100, "run" : 200},
-			"intellect" : {"read" : 50, "wrote" : 100},
-			"naturalism" : {"hiked" : 150},
-			"happiness" : {"gave a compliment" : 200},
+			"fitness" : {
+				"walked" : 10, 
+				"jogged" : 20,
+				"swam" : 25,
+				"ate healthy" : 10,
+				"worked-out": 30,
+				"ran a marathon" : 50,
+				"slept well" : 10
+				},
+			"intellect" : {
+				"read a paper" : 20, 
+				"worked on manuscript" : 30,
+				"learned a skill" : 20,
+				"taught someone" : 15,
+				"learned something interesting" : 5,
+				"met with a professor" : 15
+			},
+			"naturalism" : {
+				"hiked" : 25,
+				"identified a wild organism" : 10,
+				"collected litter" : 5,
+				"watered plants" : 10,
+				"planted something" : 40,
+				"spent time outdoors" : 10
+				},
+			"happiness" : {
+				"gave a compliment" : 20,
+				"ate something delicious" : 15,
+				"helped someone" : 25,
+				"kept my cool" : 30,
+				"gave a gift" : 35,
+				"offered help" : 5,
+				"meditated" : 20,
+				"played with a pet" : 25
+			},
 			}
+
+	# Links experience categories to stat categories
 		self.statexpdict = {
 		"fitness" : "Strength",
 		"fitness2" : "Max HP",
@@ -238,34 +256,42 @@ class Player(Actor):
 
 		}
 
-	# Links categories and related activities ("FIXED" version)
-		self.activitydict
-
 	# Aggregates experience by category
-		self.gameexp = 0
-		self.expdict = {"fitness" : 0, "intellect" : 0, "naturalism": 0, "happiness" : 0, "game" : self.gameexp}
+
+		self.expdict = {"fitness" : 0, "intellect" : 0, "naturalism": 0, "happiness" : 0, "game" : 0}
 
 	# Creates list of all options for a player to choose
 		self.optionlist = {
 			"add new activities" : self.getactivities,
-			"[demo] print all animals" : self.printanimals,
+			#"[demo] print all animals" : self.printanimals,
 			"set companion" : self.setcompanion,
+			"examine companion" : self.examinecompanion,
 			"breed organisms" : self.breed,
+			"check nursery" : self.checknursery,
 			#"play the game" : self.fourohfour,
 			#"capture" : self.capture,
 			"check stats" : self.checkstats,
+			"check inventory" : self.checkinventory,
 			"examine bestiary" : self.examinebestiary,
+			"feed companion" : self.feedcompanion,
 			"check nature log" : self.checklog,
 			"explore a new environment" : self.explorenew,
 			"explore my current environment" : self.explorecurrent,
 			"check my exp" : self.checkexp,
+			"toggle sound" : self.togglesound,
 			"quit game" : self.quitsave
 		}
+
+
+
 	# Lists the possible environments available
 		self.envlist = {
 			"meadow" : Meadow,
 			"bog" : Bog,
 			"swamp" : Swamp,
+			"forest" : Forest,
+			"plains" : Plain,
+			"dark forest" : darkForest
 		}
 
 	# Lists the options available to a player within a given environment
@@ -282,6 +308,7 @@ class Player(Actor):
 		self.equipment = []
 		self.bestiary = []
 		self.naturelog = []
+		self.nursery = []
 		self.companion = ""
 		self.formercompanion = ""
 	
@@ -301,6 +328,7 @@ class Player(Actor):
 		self.safe = True
 		self.previoustarget = ""
 		self.tempenemy = self
+		self.excludestats = ["Max HP", "Gold", "Exp"]
 
 	# For breeding organisms
 		self.dam = ""
@@ -356,6 +384,9 @@ class Player(Actor):
 		self.bounded = True
 		print("######################################################################")
 		print("You go bounding after something!")
+		if not self.currentenv.occupants:
+			print("There's nothing here...try another environment!")
+			return
 
 		def makerandom(self):
 			self.randomnum = random.randint(0, len(self.currentenv.occupants)-1)
@@ -402,74 +433,93 @@ class Player(Actor):
 		pass
 
 	def breed(self):
-		excludestats = ["Max HP", "Gold", "Exp"]
+		if not self.nursery:
+			self.excludestats = ["Max HP", "Gold", "Exp"]
 
-		class Typeholder(object):
-			def __init__(self):
-				self.type = ""
-				self.females = 0
-				self.males = 0
-				self.ready = False
+			class Typeholder(object):
+				def __init__(self):
+					self.type = ""
+					self.females = 0
+					self.males = 0
+					self.ready = False
 
-		breedready = False
-		typeset = set()
+			breedready = False
+			typeset = set()
 
-		typeholderlist = []
-		if self.bestiary:
-			for org in self.bestiary:
-				typeset.add(org.type)
-		else:
-			print("You don't have anything in your bestiary...yet!")
-			return
-		for orgtype in typeset:
-			reptype = Typeholder()
-			reptype.type = orgtype
-			for org in self.bestiary:
-				if org.type == reptype.type:
-					if org.sex == "female":
-						reptype.females += 1
-					elif org.sex == "male":
-						reptype.males += 1
-			print(reptype.type + ":" + str(reptype.males) + " males, " + str(reptype.females) + " females")
-			if (reptype.males > 0) and (reptype.females > 0):
-				typeholderlist.append(reptype)
-				reptype.ready = True
-				breedready = True
-		
+			typeholderlist = []
+			if self.bestiary:
+				for org in self.bestiary:
+					typeset.add(org.type)
+			else:
+				print("You don't have anything in your bestiary...yet!")
+				return
+			for orgtype in typeset:
+				reptype = Typeholder()
+				reptype.type = orgtype
+				for org in self.bestiary:
+					if org.type == reptype.type:
+						if org.sex == "female":
+							reptype.females += 1
+						elif org.sex == "male":
+							reptype.males += 1
+				print(reptype.type + ":" + str(reptype.males) + " males, " + str(reptype.females) + " females")
+				if (reptype.males > 0) and (reptype.females > 0):
+					typeholderlist.append(reptype)
+					reptype.ready = True
+					breedready = True
+			if breedready == False:
+				print("You don't have enough males and females of a given type who aren't related, yet!")
+				return
+			
 
 
-		readyfemales = []
-		readymales = []
-		femindex = 0
-		mindex = 0
-		if breedready == True:
-			print("######################################################################")
-			print("Which female would you like to breed?")
-			for typeholder in typeholderlist:
-				if typeholder.ready == True:
-					for org in self.bestiary:
-						if org.type == typeholder.type:
-							if org.sex == "female":
-								org.index = femindex
-								readyfemales.append(org)
-								femindex += 1
-								print("Name: " + org.name)
-								print("Type: " + org.type)
-								print("Index: " + str(org.index))
-								for stat in org.stats.keys():
-									print(stat, org.stats[stat])
+			readyfemales = []
+			readymales = []
+			femindex = 0
+			mindex = 0
+			matingdone = False
+			if matingdone == False:
+				femalechosen = False
+				while femalechosen == False and breedready == True:
+					if breedready == True:
+						print("######################################################################")
+						print("Remember, you can only breed two organisms at a time!")
+						print("Which female would you like to breed?")
+						for typeholder in typeholderlist:
+							if typeholder.ready == True:
+								for org in self.bestiary:
+									if org.type == typeholder.type:
+										if org.sex == "female":
+											org.index = femindex
+											readyfemales.append(org)
+											femindex += 1
+											print("Name: " + org.name)
+											print("Type: " + org.type)
+											print("Index: " + str(org.index))
+											if org.damID:
+												print("Dam ID: " + str(org.damID))
+											if org.babyID:
+												print("Baby ID: " + str(org.babyID))
+											for stat in org.stats.keys():
+												if stat not in self.excludestats:
+													print(stat, org.stats[stat])
+											print("\n")
 								print("\n")
-					print("\n")
-			print("Which female would you like to breed? (Available females are listed above)")
-			userfemale = input("")
-			for org in readyfemales:
-				if (userfemale == org.name) or (userfemale == str(org.index)):
-					self.dam = org
+						print("Which female would you like to breed? (Available females are listed above--you can also type 'leave')")
+						userfemale = input("")
+						if "leave" in userfemale:
+							print("Ok--leaving the breeding area.")
+							return
+						for org in readyfemales:
+							if (userfemale == org.name) or (userfemale == str(org.index)):
+								self.dam = org
+								femalechosen = True
+						if not self.dam:
+							print("Ooops--didn't get that!  Try again.")
 
-
-			print("######################################################################")
-			for typeholder in typeholderlist:
-				if typeholder.ready == True:
+				malechosen = False
+				while malechosen == False:
+					print("######################################################################")
 					for org in self.bestiary:
 						if org.type == self.dam.type:
 							if org.sex == "male":
@@ -480,58 +530,55 @@ class Player(Actor):
 								print("Type: " + org.type)
 								print("Index: " + str(org.index))
 								for stat in org.stats.keys():
-									if stat not in excludestats:
+									if stat not in self.excludestats:
 										print(stat, org.stats[stat])
 								print("\n")
-			print("Which male would you like to breed? (Available males are listed above)")
-			usermale = input("")
-			if usermale:
-				for org in readymales:
-					if (usermale == org.name) or (usermale == str(org.index)):
-						self.sire = org
-						break
+					while malechosen == False:
+						print("Which male would you like to breed? (Available males are listed above--you can also type leave)")
+						usermale = input("")
+						if "leave" in usermale:
+							print("Ok--leaving the breeding area.")
+							return
+						if usermale:
+							for org in readymales:
+								if (usermale == org.name) or (usermale == str(org.index)):
+									self.sire = org
+									malechosen = True
+									break
+						if malechosen == False:
+							print("I didn't get that--can you enter the male's ID again?")
+
+
+					print("Got it--you want to breed {0} ({1}) with {2} ({3})!".format(self.dam.name, self.dam.sex, self.sire.name, self.sire.sex))
+					print("This baby won't be ready until tomorrow--are you sure you want to lose access to these two parents until then?")
+					userwait = input("")
+					if "y" in userwait:
+						print("Ok--check back tomorrow!")
+						self.dam.matedtime = str(time.ctime())
+						self.dam.matedtime = self.dam.matedtime.split()[3]
+						self.dam.matedtime = self.dam.matedtime.split(":")[1]
+						self.bestiary.pop(self.bestiary.index(self.dam))
+						self.bestiary.pop(self.bestiary.index(self.sire))
+						self.nursery.append(self.dam)
+						self.nursery.append(self.sire)
+						matingdone = True
+						
 					else:
-						pass
+						print("Leaving the breeding area!")
+						return
 
 
-				print("Got it--you want to breed {0} ({1}) with {2} ({3})!".format(self.dam.name, self.dam.sex, self.sire.name, self.sire.sex))
+				if matingdone == False:
+					print("I didn't get that--type the index or the name of the individual you're wanting to breed.")
 
-				newbaby = organisms.Organism()
-				newbaby.type = self.dam.type
-				offspring = [newbaby]
-				organisms.givetype(offspring)
-				newbaby = offspring[0]
-
-
-				for stat in self.dam.stats.keys():
-					if stat in self.sire.stats.keys():
-						newbaby.stats[stat] = ((self.sire.stats[stat] + self.dam.stats[stat]) // 2)
-
-				print("\nMom:")
-				print("\tName: " + self.dam.name + "Type: " +  newbaby.type + "Sex: " + newbaby.sex)
-				for stat in newbaby.stats.keys():
-					print(stat, str(newbaby.stats[stat]))
-
-				print("\nDad:")
-				print("\tName: " + self.sire.name + "Type: " +  newbaby.type + "Sex: " + newbaby.sex)
-				for stat in newbaby.stats.keys():
-					print(stat, str(newbaby.stats[stat]))
-
-				print("\nThe new baby:")
-				print("\tName: " + newbaby.name + "Type: " +  newbaby.type + "Sex: " + newbaby.sex)
-				for stat in newbaby.stats.keys():
-					print(stat, str(newbaby.stats[stat]))
-
-				self.bestiary.append(newbaby)
-
+				
 
 			else:
-				print("I didn't get that--type the index or the name of the individual you're wanting to breed.")
-
-			
+				print("You don't have a male and female pair of any one type, yet!")
+				return
 
 		else:
-			print("You don't have a male and female pair of any one type, yet!")
+			print("You've already got a pair of parents in the nursery--they'll have to finish-up before you can breed anyone else!")
 
 
 		
@@ -545,6 +592,108 @@ class Player(Actor):
 		for thing in self.expdict.keys():
 			print(thing + ": " + str(self.expdict[thing]))
 
+	def checkinventory(self):
+		if self.inventory:
+			print("Here's what you have in your inventory right now:")
+			for element in self.inventory:
+				print("\t" + element.name.capitalize())
+		else:
+			print("You don't have anything in your inventory right now.")
+
+	def checknursery(self):
+		if not self.nursery:
+			print("Your nursery is currently empty--come back after you've bred two adults of the same type!")
+			return
+		
+	# Splits ctime output to produce an element of the current time (e.g. day, month, hour, etc)
+		checktime = str(time.ctime())
+		checktime = checktime.split()[3]
+		checktime = checktime.split(":")[1]
+		
+	# Checks to see if the baby is ready, yet
+		if self.dam.matedtime != checktime:
+			newbaby = organisms.Organism()
+			print("Congratulations--you've got a new baby!")
+
+		# Sets the new baby's stats
+			# New baby gets an "ID" that it then shares with mom and dad to prevent breeding with offspring
+			newbaby.babyID = random.randint(1,1000000)
+			self.sire.sireID = newbaby.babyID
+			self.dam.damID = newbaby.babyID
+			
+			# Sets the new baby as a standard orgnaism
+			newbaby = organisms.Organism()
+
+			# Gives the new baby the same type as its mother
+			newbaby.type = self.dam.type
+
+			# Makes newbaby into a list so that it can be processed by "givetype"
+			offspring = [newbaby]
+
+			# Gives newbaby a name that's half its mom and half its dad
+			species = self.sire.name.split()[1]
+			genus = self.dam.name.split()[0]
+			organisms.givetype(offspring)
+			newbaby = offspring[0]
+			newbaby.name = genus.capitalize() + " " + species.lower()
+
+
+			hybridvigor = False
+			for stat in self.dam.stats.keys():
+				if stat in self.sire.stats.keys():
+					if (self.dam.stats[stat] // 2 == 0) and (self.sire.stats[stat] // 2 == 0):
+						newbaby.stats[stat] = self.sire.stats[stat] + self.dam.stats[stat]
+						hybridvigor = True
+					elif (self.dam.stats[stat] // 2 != 0) and (self.sire.stats[stat] // 2 != 0):
+						newbaby.stats[stat] = self.sire.stats[stat] + self.dam.stats[stat]
+						hybridvigor = True
+				else:	
+					newbaby.stats[stat] = ((self.sire.stats[stat] + self.dam.stats[stat]) // 2)
+
+			print("\n\tMom:")
+			print("\tName: " + self.dam.name) 
+			print("\tType: " + self.dam.type)
+			print("\tSex: " + self.dam.sex.capitalize())
+			for stat in self.dam.stats.keys():
+				print("\t\t" + stat + " " + str(self.dam.stats[stat]))
+
+			print("\n\tDad:")
+			print("\tName: " + self.sire.name) 
+			print("\tType: " + self.sire.type)
+			print("\tSex: " + self.sire.sex.capitalize())
+			for stat in self.sire.stats.keys():
+				if stat not in self.excludestats:
+					print("\t\t" + stat + " " + str(self.sire.stats[stat]))
+
+
+			print("\n\tThe new baby is a hybrid of mom and dad:")
+			if hybridvigor == True:
+				print("\t\t...and hey--this one's got hybrid vigor (at least one enhanced trait)!")
+			print("\tName: " + newbaby.name)
+			print("\tType: " + newbaby.type) 
+			print("\tSex: " + newbaby.sex.capitalize())
+			
+			# Assigns specific stats to baby
+			for stat in newbaby.stats.keys():
+				if stat not in self.excludestats:
+					print("\t\t" + stat + " " + str(newbaby.stats[stat]))
+			
+			# Puts mom and dad back in bestiary
+			self.bestiary.append(self.sire)
+			self.bestiary.append(self.dam)
+
+			# Clears these variables for use again
+			self.sire = ""
+			self.dam = ""
+
+			# Empties the nursery
+			self.nursery = []
+
+			# Puts baby into bestiary
+			self.bestiary.append(newbaby)
+		else:
+			print("Looks like the baby's not ready yet--the parents are still nesting!  Come back tomorrow.")
+
 	def actexpdump(self):
 		for exptype in self.expdict.keys():
 			while self.expdict[exptype] >= 100:				
@@ -555,6 +704,7 @@ class Player(Actor):
 				
 
 	def gameexpdump(self):
+		# Checks to see whether or not you've earned more than ten exp points in game, and if you have, distributes them across types of exp
 		if self.expdict["game"] >= 10:
 			for exptype in self.expdict.keys():
 				if exptype != "game":
@@ -612,7 +762,7 @@ class Player(Actor):
 			self.checkHP()
 			print("######################################################################")
 			
-			print("You're facing-off against a {0}!  What do you want to do?".format(self.target.name))
+			print("You're facing-off against a {1} {0}!  What do you want to do?".format(self.target.name, self.target.sex))
 			print("You can: ")
 			for option in encoptions.keys():
 				print(option.title())
@@ -640,8 +790,10 @@ class Player(Actor):
 			self.restoreHP()
 		elif self.target.stats["HP"] < 1:
 			print("You drove the {0} off!".format(self.target.name))
+			self.tempenemy = self
+			self.target.orgdrop(self)
 			self.restoreHP()
-			self.gameexp += self.target.stats["Exp"]
+			self.expdict["game"] += self.target.stats["Exp"]
 			print("You've gained {0} exp!".format(self.target.stats["Exp"]))
 			self.previoustarget = self.target
 			self.target = ""
@@ -678,18 +830,29 @@ class Player(Actor):
 
 	# Examine bestiary
 	def examinebestiary(self):
-		excludestats = ["Max HP", "Gold", "Exp"]
+		self.excludestats = ["Max HP", "Gold", "Exp"]
 		if self.bestiary:
 			for org in self.bestiary:
 				print("\t" + "Name: " + org.name)
 				print("\t" + "Type: " + org.type)
 				print("\t" + "Sex: " + str(org.sex).title())
 				for stat in org.stats.keys():
-					if stat not in excludestats:
+					if stat not in self.excludestats:
 						print("\t\t" + stat + " " + str(org.stats[stat]))
 				print("\n")
 		else:
 			print("You don't have anything in your bestiary, yet--go out and explore!")
+	def examinecompanion(self):
+		if not self.companion:
+			print("You don't have a companion to examine right now!")
+			return
+		print("\t" + "Name: " + self.companion.name)
+		print("\t" + "Type: " + self.companion.type)
+		print("\t" + "Sex: " + str(self.companion.sex).title())
+		for stat in self.companion.stats.keys():
+			if stat not in self.excludestats:
+				print("\t\t" + stat + " " + str(self.companion.stats[stat]))
+		print("\n")
 
 	# Go exploring in the world!
 	def explorenew(self):
@@ -742,6 +905,19 @@ class Player(Actor):
 	# General error message
 	def fourohfour(self):
 		print("Ooops!  That's not working yet (but if this is \'play game\' it's not supposed to work, yet)!")
+
+	def feedcompanion(self):
+			print("What would you like to feed your companion?")
+			for element in self.inventory:
+				print(element.name.capitalize())
+			userinput = input("")
+			for element in self.inventory:
+				if userinput == element.name:
+					print("You fed {0} {1}!".format(self.companion.name, element.name))
+					print("{0}'s {1} went up by {2}!".format(self.companion.name, element.affects, element.quality))
+					self.companion.stats[element.affects] += element.quality
+					self.inventory.pop(self.inventory.index(element))
+					return
 
 
 	# Main method for gaining experience in the game; varies (or will vary) between flexible and fixed modes
@@ -898,6 +1074,9 @@ class Player(Actor):
 
 	def look(self):
 		print("You go looking for things in a reasonable way.")
+		if not self.currentenv.occupants:
+			print("There's nothing here...try another environment!")
+			return
 
 		def makerandom(self):
 			self.randomnum = random.randint(0, len(self.currentenv.occupants)-1)
@@ -966,7 +1145,7 @@ class Player(Actor):
 
 	def setcompanion(self):
 		i = 0
-		excludestats = ["Gold", "Exp", "Max HP"]
+		self.excludestats = ["Gold", "Exp", "Max HP"]
 		if self.bestiary:
 			for org in self.bestiary:
 				org.index = i
@@ -974,7 +1153,7 @@ class Player(Actor):
 				print("\tType: " + org.type)
 				print("\tBestiary Index:" + str(org.index))
 				for stat in org.stats.keys():
-					if stat not in excludestats:
+					if stat not in self.excludestats:
 						print("\t\t" + stat + ": " + str(org.stats[stat]))
 				print("\n")
 				i += 1
@@ -990,6 +1169,7 @@ class Player(Actor):
 					break
 			if self.companion != self.formercompanion and self.formercompanion:
 				print("Your new companion is {0}, and {1} has gone back into the bestiary!".format(self.companion.name, self.formercompanion.name))
+				input("")
 				self.bestiary.append(self.formercompanion)
 			else:
 				print("You've decided to keep traveling with {0} for a while.".format(self.companion.name))
@@ -999,7 +1179,9 @@ class Player(Actor):
 			print("You don't have anyone in the bestiary to choose from...yet.")
 
 	def sit(self):
-
+		if not self.currentenv.occupants:
+			print("There's nothing here...try another environment!")
+			return
 		def makerandom(self):
 			self.randomnum = random.randint(0, len(self.currentenv.occupants)-1)
 		def makesitnum(self):
@@ -1038,6 +1220,20 @@ class Player(Actor):
 			print("######################################################################")
 			print("\tIt looks like you might need to level-up your \"luck\" stat before anything will approach you in this area!")
 
+	def togglesound(self):
+		while True:
+			print("Would you like sounds on or off?")
+			userinput = input("")
+			if "f" in userinput:
+				self.soundon = False
+				print("Sound off!")
+				return
+			elif "n" in userinput:
+				self.soundon = True
+				print("Sound on!")
+				return
+			else:
+				print("I didn't get that--try again!")
 
 	def restoreHP(self):
 		self.stats["HP"] = self.stats["Max HP"]

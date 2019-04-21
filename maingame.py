@@ -29,9 +29,10 @@ def main(player):
 	# Prompts the user to choose whether to load an existing game or play a new game.
 
 
-
 	
 	gameclasses.choosenext(gameclasses.begingame())
+
+
 	#player.opener()
 
 

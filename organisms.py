@@ -64,6 +64,38 @@ class gameObject(object):
 	def __init__(self):
 		self.name = name
 
+class Food(gameObject):
+	def __init__(self):
+		self.quality = 1
+
+class hpFood(Food):
+	def __init__(self):
+		super().__init__()
+		self.affects = "HP"
+		self.name = "some grains"
+
+class speedFood(Food):
+	def __init__(self):
+		super().__init__()
+		self.affects = "Speed"
+		self.name = "some fruit"
+
+class strengthFood(Food):
+	def __init__(self):
+		super().__init__()
+		self.affects = "Strength"
+		self.name = "some meat"
+
+class luckFood(Food):
+	def __init__(self):
+		super().__init__()
+		self.affects = "Luck"
+		self.name = "some eggs"
+
+
+
+
+
 #Class given to any living thing in the game; confers basic stats
 class livingThing(gameObject):
 	def __init__(self, name="Living Thing", HP = 0):
@@ -90,6 +122,12 @@ class Organism(livingThing):
 		self.damage = 0
 		self.sound = ""
 		self.action = ""
+		self.index = 0
+		self.sex = ""
+		self.damID = ""
+		self.matedtime = ""
+		self.sireID = ""
+		self.babyID = ""
 
 		# Combat Stats
 		self.maxHP = 10
@@ -98,16 +136,18 @@ class Organism(livingThing):
 		self.speed = 1
 		self.luck = 1
 		self.skit = 1
+		self.item = ""
 		self.evolvable = True
 		self.mobile = True
 		self.gold = 1
-		self.expgiven = 10
+		self.expgiven = 1
 		
 
 		self.actions = [
 		self.orgattack, 
 		self.orgflee
 		]
+
 
 		# Organizes all combat stats into a list
 		self.stats = {
@@ -122,14 +162,14 @@ class Organism(livingThing):
 		}
 	def orgattack(self, opponent):
 		def setdamage(self):
-			self.damage = random.randint(self.strength, self.strength + self.luck)
+			self.damage = random.randint(self.stats["Strength"], self.stats["Strength"] + self.stats["Luck"])
 		setdamage(self)
 		opponent.stats["HP"] -= self.damage
 		print("{0} attacks {1} for {2} damage!".format(self.name, opponent.name, self.damage))
 
 	def orgflee(self, opponent):
 		print("The {0} attempts to flee from {1}!".format(self.name, opponent.name))
-		luckrand = random.randint(1, self.luck)
+		luckrand = random.randint(1, self.stats["Luck"])
 		enemyrand = random.randint(1, opponent.stats["Luck"])
 		if luckrand > enemyrand:
 			print("The {0} got away safely!".format(self.name))
@@ -138,10 +178,33 @@ class Organism(livingThing):
 			print("The {0} wasn't able to escape!".format(self.name))
 
 	def orgchoose(self, opponent):
-		randchoice = random.randint(0, len(self.actions)-1)
-		self.action = self.actions[randchoice]
+		randchoice = random.randint(0, 3+self.stats["Skittishness"])
+		if randchoice <= 3:
+			self.action = self.orgattack
+		elif randchoice > 3:
+			self.action = self.orgflee
 
 		return self.action(opponent)
+
+	def orgdrop(self, opponent):
+		keepchance = random.randint(0, self.stats["Luck"])
+		dropchance = random.randint(0, opponent.stats["Naturalism"])
+		if keepchance > dropchance:
+			pass
+		elif dropchance > keepchance:
+			print("{0} dropped {1}!".format(self.name, self.item.name))
+			opponent.inventory.append(self.item)
+
+
+	def genfood(self):
+		fooddict = {
+		0: hpFood,
+		1: speedFood,
+		2: strengthFood,
+		3: luckFood
+		}
+		foodnum = random.randint(0,len(fooddict)-1)
+		self.item = fooddict[foodnum]()
 
 
 
@@ -420,6 +483,7 @@ def givetype(poplist):
 	i = 0
 
 
+
 	### THIS WORKS NOW BECAUSE I'M INSTANTIATING EACH CLASS IN THE FOR LOOP INSTEAD OF ABOVE IN THE DICTIONARY--
 	### I.E. IF YOU PUT () PARENTHESES IN THE DICTIONARY VALUES, IT ONLY INSTANTIATES EACH CLASS ONCE INSTEAD OF EACH TIME
 	for org in poplist:
@@ -430,6 +494,12 @@ def givetype(poplist):
 				holderlist[i] = typedict[key]()
 				holderlist[i].truename = tempnames[i]
 				holderlist[i].name = tempnames[i]
+				holderlist[i].sex = random.randint(0,1)
+				holderlist[i].genfood()
+				if holderlist[i].sex == 1:
+					holderlist[i].sex = "male"
+				elif holderlist[i].sex == 0:
+					holderlist[i].sex = "female"
 				#print(holderlist[i], holderlist[i].type)
 		i+=1
 
