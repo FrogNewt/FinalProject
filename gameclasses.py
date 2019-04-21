@@ -232,13 +232,14 @@ class Player(Actor):
 		self.activitydict
 
 	# Aggregates experience by category
-		self.expdict = {"fitness" : 0, "intellect" : 0, "naturalism": 0, "happiness" : 0}
 		self.gameexp = 0
+		self.expdict = {"fitness" : 0, "intellect" : 0, "naturalism": 0, "happiness" : 0, "game" : self.gameexp}
 
 	# Creates list of all options for a player to choose
 		self.optionlist = {
 			"add new activities" : self.getactivities,
 			"[demo] print all animals" : self.printanimals,
+			"set companion" : self.setcompanion,
 			#"play the game" : self.fourohfour,
 			#"capture" : self.capture,
 			"examine bestiary" : self.examinebestiary,
@@ -270,6 +271,7 @@ class Player(Actor):
 		self.bestiary = []
 		self.naturelog = []
 		self.companion = ""
+		self.formercompanion = ""
 	
 	# Things the player may need to "hold" in order to advance the game
 		self.randomnum = 0
@@ -299,7 +301,6 @@ class Player(Actor):
 		setdamage(self)
 		self.target.stats["HP"] -= self.damage
 		print("{0} attacks the {1} for {2}!".format(self.name, self.target.name, self.damage))
-		self.target.orgattack(self)
 
 	def befriend(self):
 		targetindex = (self.target.stats["Skittishness"] + self.target.stats["Luck"]) // 2
@@ -323,13 +324,15 @@ class Player(Actor):
 				randnum = random.randint(1,10)
 				if randnum == 1:
 					print("Looks like your caution paid off--because this one didn't panic, it has elevated stats!")
-					self.target.stats[stat] = self.target.stats[stat] + 3
+					for stat in self.target.stats.keys():
+						self.target.stats[stat] = self.target.stats[stat] + 3
 					self.sat = False
 			self.bestiary.append(self.target)
 			self.currentenv.occupants.pop(self.currentenv.occupants.index(self.target))
 			self.safe = True
 			if not self.companion:
 				self.companion = self.target
+				print("{0} has been set as your companion!".format(self.companion.name))
 
 	def bound(self):
 		self.bounded = True
@@ -382,7 +385,8 @@ class Player(Actor):
 
 	# Checks to see how much experience the user has in each area
 	def checkexp(self):
-		print(self.expdict)
+		for thing in self.expdict.keys():
+			print(thing + ": " + self.expdict[thing])
 
 	def gameexpdump(self):
 		if self.gameexp >= 1000:
@@ -402,9 +406,14 @@ class Player(Actor):
 			input("")
 	
 	def checkHP(self):
-		print("Your HP: " + str(self.stats["HP"]))
+		print("\nYour HP: " + str(self.stats["HP"]))
 		if self.target:
 			print("Opponent HP: " + str(self.target.stats["HP"]))
+
+	def checkstats(self):
+		print("These are your current stats: ")
+		for stat in self.stats.keys():
+			print(stat+": " + str(self.stats[stat]))
 
 	def encounter(self):
 		self.safe = False
@@ -412,10 +421,10 @@ class Player(Actor):
 		self.target.stats["HP"] = self.target.stats["Max HP"]
 		# Actions the player can take
 		encoptions = {
-		"attack it" : self.attack,
-		"check HP" : self.checkHP,
+		"attack" : self.attack,
+		"check health" : self.checkHP,
 		"flee" : self.flee,
-		"befriend it" : self.befriend,
+		"befriend" : self.befriend,
 		#"capture it" : self.capture
 		}
 
@@ -430,15 +439,21 @@ class Player(Actor):
 			for option in encoptions.keys():
 				print(option.title())
 			userinput = input("")
+			choice = ""
 			proceed = False
 			for key in encoptions.keys():
-				if userinput in key:
-					encoptions[key]()
+				if userinput in key and userinput != "":
+					choice = key
+					encoptions[choice]()
 					proceed = True
+					print("######################################################################")
 					break
 			if proceed == False:
 				print("Your command wasn't clear--try typing it again!")
-			self.target.orgchoose(self)
+			elif choice == "check health":
+				pass
+			elif self.safe == False:
+				self.target.orgchoose(self)
 		if self.stats["HP"] < 1:
 			print("You were driven off!")
 			self.stats["HP"] = self.stats["Max HP"]
@@ -464,7 +479,7 @@ class Player(Actor):
 				userinput = input("")
 				goahead = False
 				for choice in self.envoptions.keys():
-					if userinput in choice:
+					if userinput in choice and userinput != "":
 						goahead = True
 				if goahead == True:
 					for choice in self.envoptions.keys():
@@ -513,7 +528,7 @@ class Player(Actor):
 			userinput = input("")
 			if userinput.lower() in self.envlist.keys():
 				for env in self.envlist.keys():
-					if userinput.lower() in env:
+					if userinput.lower() in env.lower() and userinput != "":
 						self.currentenv = self.envlist[env]()
 				break
 			else:
@@ -651,7 +666,8 @@ class Player(Actor):
 								goodexp = True
 						while True:
 							for category in self.expdict.keys():
-								print(category.title())
+								if category.lower() != "game":
+									print(category.title())
 							print("To which category should I assign that?  You can assign it to any of the above categories:\n")
 							catchoice = input("")
 							catchoice = catchoice.lower()
@@ -765,9 +781,31 @@ class Player(Actor):
 			print("Game not saved!")
 
 	def setcompanion(self):
+		i = 0
 		if self.bestiary:
-			self.examinebestiary()
-			print("You can currently have one companion traveling alongside you--who would you like it to be? (You can choose from any of the above!)")
+			for org in self.bestiary:
+				org.index = i
+				print("\tName: " + org.name)
+				print("\tType: " + org.type)
+				print("\tBestiary Index:" + str(org.index))
+				for stat in org.stats.keys():
+					print("\t\t" + stat + ": " + str(org.stats[stat]))
+				print("\n")
+				i += 1
+			print("######################################################################")
+			print("You can currently have one companion traveling alongside you--who would you like it to be?")
+			print("(You can either type the entire name or just the index number!")
+			userinput = input("")
+			for org in self.bestiary:
+				if userinput == (str(org.index) or org.name):
+					self.formercompanion = self.companion
+					self.companion = org
+					break
+			if self.companion != self.formercompanion:
+				print("Your new companion is {0}, and {1} has gone back into the bestiary!".format(self.companion.name, self.formercompanion.name))
+			else:
+				print("You've decided to keep traveling with {0} for a while.".format(self.companion.name))
+
 
 		else:
 			print("You don't have anyone in the bestiary to choose from...yet.")
@@ -809,6 +847,7 @@ class Player(Actor):
 			elif chosen == False:
 				print("\t...nothing.  Looks like you'll have to try again.")
 		else:
+			print("######################################################################")
 			print("\tIt looks like you might need to level-up your \"luck\" stat before anything will approach you in this area!")
 
 
