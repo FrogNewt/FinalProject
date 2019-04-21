@@ -4,6 +4,9 @@
 ### TURN ALL BACK ON AFTER DEBUGGING ###
 #import sys
 import re
+import random
+import pygame
+#pygame.mixer.init()
 #import pickle
 
 from shufflecipher import megacipher, intercipher
@@ -83,9 +86,14 @@ class Organism(livingThing):
 		self.truetype = ""
 		self.hasatype = False
 		self.power = False
+		self.berserk = False
+		self.damage = 0
+		self.sound = ""
+		self.action = ""
 
 		# Combat Stats
-		self.HP = 10
+		self.maxHP = 10
+		self.HP = self.maxHP
 		self.strength = 1
 		self.speed = 1
 		self.luck = 1
@@ -93,16 +101,50 @@ class Organism(livingThing):
 		self.evolvable = True
 		self.mobile = True
 		self.gold = 1
+		self.expgiven = 10
 		
+
+		self.actions = [
+		self.orgattack, 
+		self.orgflee
+		]
+
 		# Organizes all combat stats into a list
 		self.stats = {
 		"HP" : self.HP,
+		"Max HP" : self.maxHP,
 		"Strength" : self.strength,
 		"Speed" : self.speed,
 		"Skittishness" : self.skit,
 		"Luck" : self.luck,
-		"Gold" : self.gold
+		"Gold" : self.gold,
+		"Exp" : self.expgiven
 		}
+	def orgattack(self, opponent):
+		def setdamage(self):
+			self.damage = random.randint(self.strength, self.strength + self.luck)
+		setdamage(self)
+		opponent.stats["HP"] -= self.damage
+		print("{0} attacks {1} for {2} damage!".format(self.name, opponent.name, self.damage))
+
+	def orgflee(self, opponent):
+		print("The {0} attempts to flee from {1}!".format(self.name, opponent.name))
+		luckrand = random.randint(1, self.luck)
+		enemyrand = random.randint(1, opponent.stats["Luck"])
+		if luckrand > enemyrand:
+			print("The {0} got away safely!".format(self.name))
+			self.safe = True
+		else:
+			print("The {0} wasn't able to escape!".format(self.name))
+
+	def orgchoose(self, opponent):
+		randchoice = random.randint(0, len(self.actions)-1)
+		self.action = self.actions[randchoice]
+
+		return self.action(opponent)
+
+
+
 
 
 class Reptile(Organism):
@@ -111,6 +153,7 @@ class Reptile(Organism):
 		self.therm = "ecto"
 		self.type = "Reptile"
 		self.power = True
+		self.sound = "woodfrog.ogg"
 	def poweron(self):
 		self.stats["Strength"] = self.stats["Strength"] * 2
 	def printdemo(self):
@@ -122,12 +165,14 @@ class Amphibian(Organism):
 		self.therm = "ecto"
 		self.type = "Amphibian"
 		self.power = True
+		self.sound = "woodfrog.ogg"
 	def poweron(self):
 		self.stats["Luck"] = self.stats["Luck"] * 2
 
 class Bird(Organism):
 	def __init__(self):
 		super().__init__()
+		self.sound = "woodfrog.ogg"
 		self.therm = "endo"
 		self.type = "Bird"
 
@@ -137,6 +182,7 @@ class Mammal(Organism):
 		self.therm = "endo"
 		self.power = ""
 		self.type = "Mammal"
+		self.sound = "woodfrog.ogg"
 		self.power = True
 	def poweron(self):
 		self.stats["HP"] = self.stats["HP"] * 5
@@ -223,7 +269,7 @@ class greenAlgae(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "none"
-		self.type = "Green Algae"
+		self.type = "Green Alga"
 		self.mobile = False
 
 class Flatworm(Organism):
@@ -364,7 +410,8 @@ def givetype(poplist):
 	"Basidiomycetes" : Basidiomycetes,
 	"Apicomplexans" : Apicomplexan,
 	"Flatworms" : Flatworm,
-	"Roundworms" : Roundworm
+	"Roundworms" : Roundworm,
+	"Green Algae" : greenAlgae
 	}
 	
 

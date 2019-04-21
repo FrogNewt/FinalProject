@@ -50,6 +50,20 @@ def begingame():
 				gameready = True
 			else:
 				print("I didn't get your choice--can you try again? (type either 'fixed' or 'flex'")
+		soundready = False
+		while soundready == False:
+			print("One last thing--would you like to begin with sound 'on' or 'off'?")
+			soundinput = input("")
+			if "n" in soundinput:
+				print("Sound on!")
+				newplayer.soundon = True
+				soundready = True
+			elif "f" in soundinput:
+				print("Sound off!")
+				newplayer.soundon = False
+				soundready = True
+			else:
+				print("I didn't get that--try again!")
 		print("Got it--we're ready to go! (Press any key to continue)")
 		input("")
 		return newplayer
@@ -95,11 +109,16 @@ def choosenext(self):
 		for key in self.optionlist.keys():
 			print(key.title())
 		print("")
+		ready = False
 		usrinput = input("")
 		for option in self.optionlist.keys():
-			if (usrinput.lower() in option):
+			if (usrinput) and (usrinput.lower() in option):
 				print("######################################################################")
 				self.optionlist[option]()
+				ready = True
+		if ready == False:
+			print("Ooops--didn't get that!")
+
 
 def shufflebegin(poplist):
 	opened = organisms.openitup()
@@ -125,6 +144,30 @@ class Population(object):
 class gameObject(object):
 	def __init__(self):
 		self.name = name
+
+class Food(gameObject):
+	def __init__(self):
+		self.quality = 1
+
+class hpFood(Food):
+	def __init__(self):
+		super().__init__()
+		self.affects = "Speed"
+
+class speedFood(Food):
+	def __init__(self):
+		super().__init__()
+		self.affects = "Speed"
+
+class strengthFood(Food):
+	def __init__(self):
+		super().__init__()
+		self.affects = "Speed"
+
+class luckFood(Food):
+	def __init__(self):
+		super().__init__()
+		self.affects = "Speed"
 
 # Anything alive gets this class
 class livingThing(gameObject):
@@ -156,7 +199,7 @@ class Player(Actor):
 		self.intellect = 1
 		self.naturalism = 1
 		self.happiness = 1
-		self.luck = 1
+		self.luck = 3
 		self.fixed = True
 		self.soundon = True
 
@@ -196,8 +239,9 @@ class Player(Actor):
 		self.optionlist = {
 			"add new activities" : self.getactivities,
 			"[demo] print all animals" : self.printanimals,
-			"play the game" : self.fourohfour,
-			"capture" : self.capture,
+			#"play the game" : self.fourohfour,
+			#"capture" : self.capture,
+			"examine bestiary" : self.examinebestiary,
 			"check nature log" : self.checklog,
 			"explore a new environment" : self.explorenew,
 			"explore my current environment" : self.explorecurrent,
@@ -225,6 +269,7 @@ class Player(Actor):
 		self.equipment = []
 		self.bestiary = []
 		self.naturelog = []
+		self.companion = ""
 	
 	# Things the player may need to "hold" in order to advance the game
 		self.randomnum = 0
@@ -245,7 +290,7 @@ class Player(Actor):
 	def addtolog(self):
 		if self.target not in self.naturelog:
 			print("######################################################################")
-			print("{0} added to your nature log!".format(self.target.name))
+			print("{0} (a {1}) added to your nature log!".format(self.target.name, self.target.type))
 			self.naturelog.append(self.target)
 
 	def attack(self):
@@ -256,7 +301,38 @@ class Player(Actor):
 		print("{0} attacks the {1} for {2}!".format(self.name, self.target.name, self.damage))
 		self.target.orgattack(self)
 
+	def befriend(self):
+		targetindex = (self.target.stats["Skittishness"] + self.target.stats["Luck"]) // 2
+		playerindex = (self.stats["Naturalism"] + self.stats["Luck"]) // 2
+		print("You attempt to befriend the {0}!".format(self.target.name))
+		input("")
+		if targetindex >= playerindex:
+			print("You failed--the {0} isn't having it!".format(self.target.name))
+		elif targetindex < playerindex:
+			print("You did it--you've befriended the {0}!  It follows you into the bestiary!".format(self.target.name))
+			if self.bounded == True:
+				randnum = random.randint(1,3)
+				if randnum == 1:
+					print("Looks like bounding after this thing weakened it...that happens sometimes.")
+					for stat in self.target.stats.keys():
+						self.target.stats[stat] = self.target.stats[stat] - 2
+						if self.target.stats[stat] < 1:
+							self.target.stats[stat] = 1
+					self.bounded = False
+			elif self.sat == True:
+				randnum = random.randint(1,10)
+				if randnum == 1:
+					print("Looks like your caution paid off--because this one didn't panic, it has elevated stats!")
+					self.target.stats[stat] = self.target.stats[stat] + 3
+					self.sat = False
+			self.bestiary.append(self.target)
+			self.currentenv.occupants.pop(self.currentenv.occupants.index(self.target))
+			self.safe = True
+			if not self.companion:
+				self.companion = self.target
+
 	def bound(self):
+		self.bounded = True
 		print("######################################################################")
 		print("You go bounding after something!")
 
@@ -268,12 +344,8 @@ class Player(Actor):
 		
 		#Checks whether or not the target gets super-strength as a result of your intrusion
 		def checkberserk(self):
-			print("Berserk test")
 			if self.target.stats["Luck"] > self.boundnum:
 				self.target.berserk = True
-		
-			print("My boundnum:" + str(self.boundnum))
-			print("Organism's luck: " + str(self.target.stats["Luck"]))
 
 			if self.target.berserk == True:
 				self.target.stats["Strength"] = self.target.stats["Strength"] * 2
@@ -299,12 +371,14 @@ class Player(Actor):
 		
 		# Add organism to nature log if yet unseen
 		self.addtolog()
+		self.encounter()
 
 	# Attempts to capture the current target
-	def capture(self):
-		self.bestiary.append(organism)
-		print("You've captured a wild {0}--it looks like it might be a {1}!".format(organism.name, organism.type))
-		print(self.bestiary)
+	#def capture(self):
+		#self.bestiary.append(organism)
+		#print("You've captured a wild {0}--it looks like it might be a {1}!".format(organism.name, organism.type))
+		#print(self.bestiary)
+		pass
 
 	# Checks to see how much experience the user has in each area
 	def checkexp(self):
@@ -341,24 +415,30 @@ class Player(Actor):
 		"attack it" : self.attack,
 		"check HP" : self.checkHP,
 		"flee" : self.flee,
-		#"befriend it" : self.befriend,
+		"befriend it" : self.befriend,
 		#"capture it" : self.capture
 		}
 
 		# Actions the enemy can take
 
-
+		self.playsound()
 		while (self.safe == False) and (self.stats["HP"] > 0) and (self.target.safe == False) and (self.target.stats["HP"] > 0):
 			print("######################################################################")
-			self.playsound()
+			
 			print("You're facing-off against a {0}!  What do you want to do?".format(self.target.name))
 			print("You can: ")
 			for option in encoptions.keys():
 				print(option.title())
 			userinput = input("")
+			proceed = False
 			for key in encoptions.keys():
 				if userinput in key:
 					encoptions[key]()
+					proceed = True
+					break
+			if proceed == False:
+				print("Your command wasn't clear--try typing it again!")
+			self.target.orgchoose(self)
 		if self.stats["HP"] < 1:
 			print("You were driven off!")
 			self.stats["HP"] = self.stats["Max HP"]
@@ -400,6 +480,19 @@ class Player(Actor):
 			print("Ooops--you haven't chosen an environment to start with, yet!  Better go back and pick a new one, first.")
 			input("")
 
+	# Examine bestiary
+	def examinebestiary(self):
+		excludestats = ["Max HP", "Gold", "Exp"]
+		if self.bestiary:
+			for org in self.bestiary:
+				print("\t" + "Name: " + org.name)
+				print("\t" + "Type: " + org.type)
+				for stat in org.stats.keys():
+					if stat not in excludestats:
+						print("\t\t" + stat + " " + str(org.stats[stat]))
+				print("\n")
+		else:
+			print("You don't have anything in your bestiary, yet--go out and explore!")
 
 	# Go exploring in the world!
 	def explorenew(self):
@@ -626,17 +719,22 @@ class Player(Actor):
 		self.encounter()
 
 	def playsound(self):
+		newsound = ""
 		if self.soundon:
 			if self.target.sound:
 				pygame.mixer.init()
-				pygame.mixer.music.load(self.target.sound)
-				pygame.mixer.music.play()
+				newsound = pygame.mixer.Sound(self.target.sound)
+				pygame.mixer.Channel(1).play(newsound)
+				time.sleep(2)
+				pygame.mixer.Channel(1).stop()
+
 
 # Used to print out all animals and their shuffled names for debugging use
 	def printanimals(self):
 		for animal in self.popmaster:
 			print("Current Name:" + animal.name + "\n", "True Name: " + animal.truename + "\n", "Mega-Shuffled Name: " + animal.meganame + "\n","Inter-Shuffled Name: " + animal.intername + "\n", "Type: " + animal.type + "\n")
-
+			for stat in animal.stats.keys():
+				print("\t"+stat+":"+ " " + str(animal.stats[stat]))
 
 # Used to strictly save the game (without quitting)
 	def save(self, namedfile="newgame1"):
@@ -665,6 +763,14 @@ class Player(Actor):
 					print("Game Saved!")
 		else:
 			print("Game not saved!")
+
+	def setcompanion(self):
+		if self.bestiary:
+			self.examinebestiary()
+			print("You can currently have one companion traveling alongside you--who would you like it to be? (You can choose from any of the above!)")
+
+		else:
+			print("You don't have anyone in the bestiary to choose from...yet.")
 
 	def sit(self):
 
@@ -698,6 +804,7 @@ class Player(Actor):
 				#	occupant.stats[stat] = occupant.stats[stat]//2
 				print("\tA wild {1} cautiously appears--it looks like a {0}!".format(self.target.name, self.target.type))
 				self.addtolog()
+				self.sat = True
 				self.encounter()
 			elif chosen == False:
 				print("\t...nothing.  Looks like you'll have to try again.")

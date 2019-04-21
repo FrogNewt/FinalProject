@@ -34,7 +34,7 @@ def assignstats(env, player):
 		if org not in statorgs:
 			statorgs.append(org)
 			for stat in org.stats.keys():
-				org.stats[stat] = org.stats[stat] * (random.randint((env.difficulty-3 if (env.difficulty-2 > 0) else 1), env.difficulty))
+				org.stats[stat] = org.stats[stat] * (random.randint((env.difficulty-2 if (env.difficulty-2 > 0) else 1), env.difficulty))
 		if org.power:
 			org.poweron()
 	return statorgs
@@ -48,13 +48,7 @@ class basicEnv(object):
 		self.difficulty = 1
 		self.animalnum = 10
 		self.occupants = []
-
-class aquaEnv(basicEnv):
-	def __init__(self):
-		self.name = "A basic aquatic environment"
-		self.difficulty = 1
-		self.animalnum = 10
-		self.hasaquatics = True
+		self.hasaquatics = False
 
 	def genorgs(self, player):
 		templist = []
@@ -64,7 +58,10 @@ class aquaEnv(basicEnv):
 		# This can be amended to operate within a range.
 		for org in player.popmaster:
 			if org.mobile == True:
-				templist.append(org)
+				if (self.hasaquatics == False) and org.type == ("Amphibian" or "Fish"):
+					pass
+				else:
+					templist.append(org)
 		for i in range(self.animalnum):
 			newchoice = random.choice(templist)
 			pickedlist.append(newchoice)
@@ -82,6 +79,14 @@ class aquaEnv(basicEnv):
 				org.poweron()
 		return statorgs
 
+class aquaEnv(basicEnv):
+	def __init__(self):
+		self.name = "A basic aquatic environment"
+		self.difficulty = 1
+		self.animalnum = 10
+		self.hasaquatics = True
+
+
 class startArea(basicEnv):
 	def __init__(self):
 		super().__init__()
@@ -96,6 +101,7 @@ class Bog(aquaEnv):
 
 class Swamp(aquaEnv):
 	def __init__(self):
+		super().__init__()
 		self.animalnum = 20
 		self.difficulty = 7
 		self.name = "A Swamp"
