@@ -64,6 +64,8 @@ class basicEnv(object):
 					templist.append(org)
 		for i in range(self.animalnum):
 			newchoice = random.choice(templist)
+			newchoice.evthreshold1 *= player.currentenv.difficulty
+			newchoice.evthreshold2 *= player.currentenv.difficulty
 			pickedlist.append(newchoice)
 				
 		return pickedlist
@@ -106,10 +108,10 @@ class Swamp(aquaEnv):
 		self.difficulty = 7
 		self.name = "a swamp"
 
-class Forest(basicEnv):
+class Woods(basicEnv):
 	def __init__(self):
 		super().__init__()
-		self.name = "an expansive forest"
+		self.name = "a wooded expanse"
 		self.difficulty = 10
 		self.animalnum = 25
 

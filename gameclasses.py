@@ -31,12 +31,16 @@ def begingame():
 		print("Hi {0}!".format(newplayer.name))
 		newplayer.popmaster = popmain.popmaster
 		print("Oh--before we get started, we should pick a game mode!")
+		print("(Press any key to continue)")
 		input("")
 		print("You can choose between 'Fixed' and 'Flex' modes:")
+		print("(Press any key)")
 		input("")
 		print("\t'Fixed' (default) comes pre-loaded with common daily goals.")
+		print("(Press any key)")
 		input("")
 		print("\t'Flex' mode allows you to choose and customize your own goals (recommended for people who trust themselves not to cheat!)")
+		print("(Press any key)")
 		input("")
 		gameready = False
 		while gameready == False:
@@ -44,9 +48,11 @@ def begingame():
 			flexchoice = input("")
 			if "l" in flexchoice.lower():
 				newplayer.fixed = False
+				newplayer.setactivitydict()
 				gameready = True
 			elif "d" in flexchoice.lower():
 				newplayer.fixed = True
+				newplayer.setactivitydict()
 				gameready = True
 			else:
 				print("I didn't get your choice--can you try again? (type either 'fixed' or 'flex'")
@@ -200,7 +206,7 @@ class Player(Actor):
 		self.intellect = 1
 		self.naturalism = 1
 		#self.happiness = 1
-		self.luck = 2
+		self.luck = 20
 		self.fixed = True
 		self.soundon = True
 
@@ -213,55 +219,6 @@ class Player(Actor):
 		"Naturalism" : self.naturalism,
 		"Luck" : self.luck
 		}
-	# Links categories and related activities ("FLEX" version)
-		
-		if self.fixed == False:
-		# Sets categories to be used (empty) for flex mode for leveling-up
-			self.activitydict = {
-			"fitness" : {}, 
-			"intellect" : {}, 
-			"naturalism" : {}, 
-			"happiness" : {}
-			}
-		elif self.fixed == True:
-		# Sets activities to be included in "fixed" mode for leveling-up
-			self.activitydict = {
-			"fitness" : {
-				"walked" : 10, 
-				"jogged" : 20,
-				"swam" : 25,
-				"ate healthy" : 10,
-				"worked-out": 30,
-				"ran a marathon" : 50,
-				"slept well" : 10
-				},
-			"intellect" : {
-				"read a paper" : 20, 
-				"worked on manuscript" : 30,
-				"learned a skill" : 20,
-				"taught someone" : 15,
-				"learned something interesting" : 5,
-				"met with a professor" : 15
-			},
-			"naturalism" : {
-				"hiked" : 25,
-				"identified a wild organism" : 10,
-				"collected litter" : 5,
-				"watered plants" : 10,
-				"planted something" : 40,
-				"spent time outdoors" : 10
-				},
-			"happiness" : {
-				"gave a compliment" : 20,
-				"ate something delicious" : 15,
-				"helped someone" : 25,
-				"kept my cool" : 30,
-				"gave a gift" : 35,
-				"offered help" : 5,
-				"meditated" : 20,
-				"played with a pet" : 25
-			},
-			}
 
 	# Links experience categories to stat categories
 		self.statexpdict = {
@@ -281,7 +238,7 @@ class Player(Actor):
 
 		self.orgsdict = {
 		"set companion" : self.setcompanion,
-		"examine companion" : self.examinecompanion,
+		"inspect companion" : self.examinecompanion,
 		"feed companion" : self.feedcompanion,
 		"rest companion" : self.restcompanion,
 		"check resting organisms" : self.checkresting,
@@ -349,7 +306,7 @@ class Player(Actor):
 			"meadow" : Meadow,
 			"bog" : Bog,
 			"swamp" : Swamp,
-			"forest" : Forest,
+			"woods" : Woods,
 			"plains" : Plain,
 			"dark forest" : darkForest
 		}
@@ -442,6 +399,7 @@ class Player(Actor):
 				print("{0} has been set as your companion!".format(self.companion.name))
 
 	def bound(self):
+		print("\n ### GO BOUNDING AFTER THINGS ### ")
 		self.bounded = True
 		print("######################################################################")
 		print("You go bounding after something!")
@@ -462,7 +420,8 @@ class Player(Actor):
 
 			if self.target.berserk == True:
 				self.target.stats["Strength"] = self.target.stats["Strength"] * 2
-				print("(And it looks PISSED!)")
+				print("(And it looks PISSED, which means it's going to be stronger but give more exp!)")
+				self.target.stats["Exp"] *= 2
 
 		self.target = ""
 		chosen = False
@@ -493,7 +452,58 @@ class Player(Actor):
 		#print(self.bestiary)
 		pass
 
+	# Links categories and related activities ("FLEX" version)
+	def setactivitydict(self):
+		if self.fixed == False:
+		# Sets categories to be used (empty) for flex mode for leveling-up
+			self.activitydict = {
+			"fitness" : {}, 
+			"intellect" : {}, 
+			"naturalism" : {}, 
+			"happiness" : {}
+			}
+		elif self.fixed == True:
+		# Sets activities to be included in "fixed" mode for leveling-up
+			self.activitydict = {
+			"fitness" : {
+				"walked" : 10, 
+				"jogged" : 20,
+				"swam" : 25,
+				"ate healthy" : 10,
+				"worked-out": 30,
+				"ran a marathon" : 50,
+				"slept well" : 10
+				},
+			"intellect" : {
+				"read a paper" : 20, 
+				"worked on manuscript" : 30,
+				"learned a skill" : 20,
+				"taught someone" : 15,
+				"learned something interesting" : 5,
+				"met with a professor" : 15
+			},
+			"naturalism" : {
+				"hiked" : 25,
+				"identified a wild organism" : 10,
+				"collected litter" : 5,
+				"watered plants" : 10,
+				"planted something" : 40,
+				"spent time outdoors" : 10
+				},
+			"happiness" : {
+				"gave a compliment" : 20,
+				"ate something delicious" : 15,
+				"helped someone" : 25,
+				"kept my cool" : 30,
+				"gave a gift" : 35,
+				"offered help" : 5,
+				"meditated" : 20,
+				"played with a pet" : 25
+			},
+			}
+	
 	def breed(self):
+		print("### BREED ORGANISMS ###")
 		if not self.nursery:
 			self.excludestats = ["Max HP", "Gold", "Exp"]
 
@@ -641,6 +651,8 @@ class Player(Actor):
 		else:
 			print("You've already got a pair of parents in the nursery--they'll have to finish-up before you can breed anyone else!")
 
+		print("######################################################################")
+
 
 		
 
@@ -650,21 +662,27 @@ class Player(Actor):
 
 	# Checks to see how much experience the user has in each area
 	def checkexp(self):
+		print("\n ### CHECK MY EXP ### ")
 		for thing in self.expdict.keys():
-			print(thing + ": " + str(self.expdict[thing]))
+			print(thing.capitalize() + ": " + str(self.expdict[thing]))
+		print("######################################################################")
 
 	def checkinventory(self):
+		print("\n ### CHECK INVENTORY ### ")
 		if self.inventory:
 			print("Here's what you have in your inventory right now:")
 			for element in self.inventory:
 				print("\t" + element.name.capitalize())
 		else:
 			print("You don't have anything in your inventory right now.")
+		print("######################################################################")
 
 	def checknursery(self):
+		print("\n ### CHECK NURSERY ### ")
 		if not self.nursery:
 			print("Your nursery is currently empty--come back after you've bred two adults of the same type!")
 			return
+		print("######################################################################")
 		
 	# Splits ctime output to produce an element of the current time (e.g. day, month, hour, etc)
 		checktime = str(time.ctime())
@@ -692,8 +710,10 @@ class Player(Actor):
 			offspring = [newbaby]
 
 			# Gives newbaby a name that's half its mom and half its dad
-			species = self.sire.name.split()[1]
-			genus = self.dam.name.split()[0]
+			species = self.sire.name.split()
+			species = species[1]
+			genus = self.dam.name.split()
+			genus = genus[0]
 			organisms.givetype(offspring)
 			newbaby = offspring[0]
 			newbaby.name = genus.capitalize() + " " + species.lower()
@@ -758,7 +778,7 @@ class Player(Actor):
 
 	def actexpdump(self):
 		for exptype in self.expdict.keys():
-			while self.expdict[exptype] >= 100:				
+			while self.expdict[exptype] > 100:				
 				for key in self.statexpdict.keys():
 					if exptype.lower() in key.lower():
 						self.stats[self.statexpdict[exptype]] += 1
@@ -774,8 +794,8 @@ class Player(Actor):
 			self.expdict["game"] -= 10
 
 	def checklog(self):
+		print("\n ### NATURE LOG ### ")
 		if self.naturelog:
-			print("\n ### NATURE LOG ### ")
 			for element in self.naturelog:
 				print("Shuffled-name: " + "\t" + element.name)
 				print("Type: " + element.type + "\n")
@@ -783,18 +803,24 @@ class Player(Actor):
 		else:
 			print("Your nature log is empty--go find something!")
 			input("")
+		print("######################################################################")
 	
 	def checkHP(self):
+		print("\n ### HP ### ")
 		print("\nYour HP: " + str(self.stats["HP"]))
 		if self.companion:
 			print("{0}'s HP: ".format(self.companion.name) + str(self.companion.stats["HP"]))
 		if self.target:
 			print("Opponent HP: " + str(self.target.stats["HP"]))
+		print("######################################################################")
 
 	def checkstats(self):
+		print("\n ### CHECK STATS ### ")
 		print("These are your current stats: ")
 		for stat in self.stats.keys():
 			print(stat+": " + str(self.stats[stat]))
+		print("######################################################################")
+
 
 	def companionattack(self):
 		if self.companion and self.companion.stats["HP"] > 0:
@@ -898,6 +924,7 @@ class Player(Actor):
 
 	# Examine bestiary
 	def examinebestiary(self):
+		print("\n ### EXAMINE BESTIARY ### ")
 		self.excludestats = ["Max HP", "Gold", "Exp"]
 		if self.bestiary:
 			for org in self.bestiary:
@@ -910,7 +937,10 @@ class Player(Actor):
 				print("\n")
 		else:
 			print("You don't have anything in your bestiary, yet--go out and explore!")
+		print("######################################################################")
+
 	def examinecompanion(self):
+		print("\n ### EXAMINE COMPANION ### ")
 		if not self.companion:
 			print("You don't have a companion to examine right now!")
 			return
@@ -921,9 +951,11 @@ class Player(Actor):
 			if stat not in self.excludestats:
 				print("\t\t" + stat + " " + str(self.companion.stats[stat]))
 		print("\n")
+		print("######################################################################")
 
 	# Go exploring in the world!
 	def explorenew(self):
+		print("\n ### EXPLORE A NEW ENVIRONMENT ### ")
 		while self.currentenv:
 			print("Are you sure you want to leave {0}?".format(self.currentenv.name))
 			userinput = input("")
@@ -949,6 +981,7 @@ class Player(Actor):
 		
 		currentlist = self.currentenv.genorgs(self)
 		self.currentenv.occupants = self.currentenv.assignstats(currentlist)
+		print("######################################################################")
 
 
 
@@ -972,9 +1005,10 @@ class Player(Actor):
 
 	# General error message
 	def fourohfour(self):
-		print("Ooops!  That's not working yet (but if this is \'play game\' it's not supposed to work, yet)!")
+		print("Ooops!  That's not working yet!")
 
 	def feedcompanion(self):
+			print("\n ### FEED YOUR COMPANION ### ")
 			print("What would you like to feed your companion?")
 			for element in self.inventory:
 				print(element.name.capitalize())
@@ -985,13 +1019,16 @@ class Player(Actor):
 					print("{0}'s {1} went up by {2}!".format(self.companion.name, element.affects, element.quality))
 					self.companion.stats[element.affects] += element.quality
 					self.inventory.pop(self.inventory.index(element))
+					print("######################################################################")
+					print('\n')
 					return
+			print("######################################################################")
 
 
 	# Main method for gaining experience in the game; varies (or will vary) between flexible and fixed modes
 	def getactivities(self):
 		def fixedactivities(self):
-			print("You're in fixed!")
+			print("### FIXED MODE ###")
 			fullbreak = False
 			activitygiven = False
 			while True:
@@ -1007,16 +1044,18 @@ class Player(Actor):
 					break
 				count = 0
 				
+
 				if "list" in activity.lower():
 					for category in self.activitydict.keys():
 						print(category.capitalize())
 						for action in self.activitydict[category].keys():
 							print("\t"+action.capitalize()+":"+" " +str(self.activitydict[category][action]))
 
+
 				# Determines whether or not the activity has been done before
-				if activitygiven:
+				if activitygiven and activity != "list":
 					for category in self.activitydict.keys():
-						if activity in self.activitydict[category]:
+						if activity.lower() in self.activitydict[category]:
 							count += 1
 							print("######################################################################")
 							print("Got it!")
@@ -1029,6 +1068,7 @@ class Player(Actor):
 						print("######################################################################")
 						print("It doesn't look like that one's on the list--try typing it again (exactly as written).")
 						print("If you'd prefer to customize your experience more, you can always start a game in 'flex' mode!)")
+						print("(Press any key to continue)")
 						input("")
 
 				
@@ -1054,81 +1094,91 @@ class Player(Actor):
 
 
 		def flexactivities(self):
-			print("You're in flex!")
+			print("### FLEX MODE ###")
 			fullbreak = False
 			while True:
-				greeting = print("What did you do, today? (or you can 'leave' to move on or 'quit' to quit the game!)")
+				greeting = print("What did you do, today? (you can also type 'list' (to see previous activities), 'leave' (move on), or 'quit')")
 				activity = input("")
+				activity = activity.lower()
+				activitygiven = False
+				if len(activity) > 0:
+					activitygiven = True
 				if "quit" in activity:
 					self.quitsave()
 				elif "leave" in activity:
 					break
 				count = 0
 				
-				# Determines whether or not the activity has been done before
-				while True:
+				if "list" in activity.lower():
 					for category in self.activitydict.keys():
-						if activity in self.activitydict[category]:
-							count += 1
-							print("You've done that one before!")
-							current = self.activitydict[category][activity]
-							print("You've added {0} experience points to {1}!".format(current, category))
-							self.expdict[category] += current
-							break
-					
-					# Indicates that the activity hasn't been done before
-					if count == 0:
-						# Assigns a quantity of experience points to your activity
-						goodexp = False
-						print("That's a new one--how many experience points is it worth?  (Give a number between 1 and 50!)")
-						while goodexp == False:
-							while True:
-								activityexp = input("")
-								try:
-									activityexpint = int(activityexp)
-									break
-								except ValueError:
-									print("Could not convert data to an integer--give a number between 1 and 50.")
-							if (activityexpint > 50) | (activityexpint < 1):
-								print("Ooops--that number won't work!  Choose an amount of exp between 1 and 50.")
-							else:
-								goodexp = True
-						while True:
-							for category in self.expdict.keys():
-								if category.lower() != "game":
-									print(category.title())
-							print("To which category should I assign that?  You can assign it to any of the above categories:\n")
-							catchoice = input("")
-							catchoice = catchoice.lower()
-							if catchoice in self.expdict.keys():
-								self.expdict[catchoice] += activityexpint
-								print("{0} exp added to {1}!".format(activityexpint, catchoice))
-								self.activitydict[catchoice][activity] = activityexpint
+						print(category.capitalize())
+						for action in self.activitydict[category].keys():
+							print("\t"+action.capitalize()+":"+" " +str(self.activitydict[category][action]))
+				# Determines whether or not the activity has been done before
+				if (("list" not in activity.lower()) or ("list" != activity.lower())) and (activitygiven == True):
+					while True:
+						for category in self.activitydict.keys():
+							if activity.lower() in self.activitydict[category]:
+								count += 1
+								print("You've done that one before!")
+								current = self.activitydict[category][activity.lower()]
+								print("You've added {0} experience points to {1}!".format(current, category))
+								self.expdict[category] += current
 								break
-							else:
-								print("Ooops--that one didn't register.  Try entering it again!")
 						
-						while goodexp == False:
-							activityexp = input("")
+						# Indicates that the activity hasn't been done before
+						if count == 0:
+							# Assigns a quantity of experience points to your activity
+							goodexp = False
+							print("That's a new one--how many experience points is it worth?  (Give a number between 1 and 50!)")
+							while goodexp == False:
+								while True:
+									activityexp = input("")
+									try:
+										activityexpint = int(activityexp)
+										break
+									except ValueError:
+										print("Could not convert data to an integer--give a number between 1 and 50.")
+								if (activityexpint > 50) | (activityexpint < 1):
+									print("Ooops--that number won't work!  Choose an amount of exp between 1 and 50.")
+								else:
+									goodexp = True
+							while True:
+								for category in self.expdict.keys():
+									if category.lower() != "game":
+										print(category.title())
+								print("To which category should I assign that?  You can assign it to any of the above categories:\n")
+								catchoice = input("")
+								catchoice = catchoice.lower()
+								if catchoice in self.expdict.keys():
+									self.expdict[catchoice] += activityexpint
+									print("{0} exp added to {1}!".format(activityexpint, catchoice))
+									self.activitydict[catchoice][activity.lower()] = activityexpint
+									break
+								else:
+									print("Ooops--that one didn't register.  Try entering it again!")
+							
+							while goodexp == False:
+								activityexp = input("")
 
-						self.activitydict[catchoice.lower()][activity] = activityexpint
-						
-					print("One more activity?")
-					endinput = input("")
-					if "quit" in endinput:
-						self.quitsave()
-				
-					if ("n" in endinput and (len(endinput) < 2)) or ("no" in endinput):
-						fullbreak = True
-
-						# Prompts user to save the game
-						self.save()
-
-						break
+							self.activitydict[catchoice.lower()][activity] = activityexpint
+							
+						print("One more activity?")
+						endinput = input("")
+						if "quit" in endinput:
+							self.quitsave()
 					
-					# Returns to original question about activities (what did you do, today?)
-					else:
-						break
+						if ("n" in endinput and (len(endinput) < 2)) or ("no" in endinput):
+							fullbreak = True
+
+							# Prompts user to save the game
+							self.save()
+
+							break
+						
+						# Returns to original question about activities (what did you do, today?)
+						else:
+							break
 
 				if fullbreak == True:
 					break
@@ -1144,6 +1194,7 @@ class Player(Actor):
 		self.brokenloop = True
 
 	def look(self):
+		print("\n ### GO LOOKING FOR THINGS (REASONABLE) ### ")
 		print("You go looking for things in a reasonable way.")
 		if not self.currentenv.occupants:
 			print("There's nothing here...try another environment!")
@@ -1164,14 +1215,14 @@ class Player(Actor):
 		self.target = occupant
 		# Checks to see if the player is eligible to have organisms approach
 	
-		print("You found something!")
+		print("You found a {0} ({1})!".format(self.target.name, self.target.type))
 		self.addtolog()
 		self.encounter()
 
 	def playsound(self):
-		newsound = ""
+		newsound = "a"
 		if self.soundon:
-			if self.target.sound:
+			if self.target.sound and (self.target.sound != "Monster.ogg"):
 				pygame.mixer.init()
 				newsound = pygame.mixer.Sound(self.target.sound)
 				pygame.mixer.Channel(1).play(newsound)
@@ -1188,6 +1239,7 @@ class Player(Actor):
 
 # Used to strictly save the game (without quitting)
 	def save(self, namedfile="newgame1"):
+		print("\n ### SAVE GAME ### ")
 		save = input("Save game? (y/n)\n")
 		if "y" in save:
 			print("Choose a filename! (Default is '{0}') ".format(namedfile))
@@ -1213,8 +1265,10 @@ class Player(Actor):
 					print("Game Saved!")
 		else:
 			print("Game not saved!")
+		print("######################################################################")
 
 	def setcompanion(self):
+		print("\n ### SET YOUR COMPANION ### ")
 		i = 0
 		self.excludestats = ["Gold", "Exp", "Max HP"]
 		if self.bestiary:
@@ -1248,8 +1302,10 @@ class Player(Actor):
 
 		else:
 			print("You don't have anyone in the bestiary to choose from...yet.")
+		print("######################################################################")
 
 	def sit(self):
+		print("\n ### SIT AND WAIT ### ")
 		if not self.currentenv.occupants:
 			print("There's nothing here...try another environment!")
 			return
@@ -1286,23 +1342,26 @@ class Player(Actor):
 				self.sat = True
 				self.encounter()
 			elif chosen == False:
-				print("\t...nothing.  Looks like you'll have to try again.")
+				print("\t...nothing approached you.  Looks like you'll have to try again (or you can increase your luck to improve the chances of something approaching!).")
 		else:
 			print("######################################################################")
 			print("\tIt looks like you might need to level-up your \"luck\" stat before anything will approach you in this area!")
 
 	def toggleflex(self):
 		if self.fixed == True:
+			print("\n ### FIXED MODE ### ")
 			print("You're currently on fixed mode.")
 			print("Would you like to switch to flex mode?")
 			userinput = input("")
 			if "y" in userinput:
 				print("Ok!  Switched to flex mode!")
 				self.fixed = False
+				self.setactivitydict()
 			else:
 				print("Didn't switch modes--still in fixed.")
 				return
 		elif self.fixed == False:
+			print("\n ### FLEX MODE ### ")
 			print("You're currently on flex mode.")
 			print("Would you like to switch to fixed mode?")
 			userinput = input("")
@@ -1312,24 +1371,31 @@ class Player(Actor):
 				if "y" in userinput2:
 					print("Switched from flex to fixed!")
 					self.fixed = True
+					self.setactivitydict()
+		print("######################################################################")
 
 
 	def togglesound(self):
+		print("\n ### TOGGLE SOUND ### ")
 		while True:
 			print("Would you like sounds on or off?")
 			userinput = input("")
 			if "f" in userinput:
 				self.soundon = False
 				print("Sound off!")
+				print("######################################################################")
 				return
 			elif "n" in userinput:
 				self.soundon = True
 				print("Sound on!")
+				print("######################################################################")
 				return
 			else:
 				print("I didn't get that--try again!")
+		print("######################################################################")
 
 	def restcompanion(self):
+		print("\n ### REST YOUR COMPANION ### ")
 		if self.companion:
 			print("Would you like to rest your companion?  It'll rest for at least one day, but it'll get stronger for every day it rests!")
 			userinput = input("")
@@ -1346,8 +1412,10 @@ class Player(Actor):
 		else:
 			print("You don't have a companion to rest right now.")
 			input("")
+		print("######################################################################")
 
 	def checkresting(self):
+		print("\n ### CHECK RESTING ORGANISMS ### ")
 		timenow = str(time.ctime()).split()[0]
 		if self.hotel:
 			print("These organisms are currently resting:")
@@ -1381,6 +1449,7 @@ class Player(Actor):
 		else:
 			print("No one's ready to wake up, yet--come back later!")
 			input("")
+		print("######################################################################")
 
 	def restoreHP(self):
 		self.stats["HP"] = self.stats["Max HP"]
@@ -1389,6 +1458,7 @@ class Player(Actor):
 
 # Verifies that the user wants to quit and offers to save the game
 	def quitsave(self, namedfile="newgame1"):
+			print("\n ### QUIT GAME ### ")
 			choice = input("Are you sure you want to quit? ")
 			if "y" in choice:
 				self.save(namedfile)
@@ -1396,6 +1466,7 @@ class Player(Actor):
 				quit()
 			else:
 				pass
+			print("######################################################################")
 
 
 	
