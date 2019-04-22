@@ -257,7 +257,7 @@ class Reptile(Organism):
 		self.therm = "ecto"
 		self.type = "Reptile"
 		self.power = True
-		self.sound = "woodfrog.ogg"
+		self.sound = "Sounds/woodfrog.ogg"
 	def poweron(self):
 		self.stats["Strength"] = self.stats["Strength"] * 2
 	def printdemo(self):
@@ -269,14 +269,14 @@ class Amphibian(Organism):
 		self.therm = "ecto"
 		self.type = "Amphibian"
 		self.power = True
-		self.sound = "woodfrog.ogg"
+		self.sound = "Sounds/Amphibian.ogg"
 	def poweron(self):
 		self.stats["Luck"] = self.stats["Luck"] * 2
 
 class Bird(Organism):
 	def __init__(self):
 		super().__init__()
-		self.sound = "woodfrog.ogg"
+		self.sound = "Sounds/Bird.ogg"
 		self.therm = "endo"
 		self.type = "Bird"
 
@@ -286,7 +286,7 @@ class Mammal(Organism):
 		self.therm = "endo"
 		self.power = ""
 		self.type = "Mammal"
-		self.sound = "woodfrog.ogg"
+		self.sound = "Sounds/Mammal.ogg"
 		self.power = True
 	def poweron(self):
 		self.stats["HP"] = self.stats["HP"] * 5
@@ -316,6 +316,7 @@ class Insect(Organism):
 		super().__init__()
 		self.therm = "none"
 		self.type = "Insect"
+		self.sound = "Sounds/Insect.ogg"
 		self.power = True
 	def poweron(self):
 		self.stats["Skittishness"] = self.stats["Skittishness"] * 5
@@ -341,6 +342,7 @@ class Dragon(Organism):
 		super().__init__()
 		self.therm = "none"
 		self.type = "Dragon"
+		self.sound = "Sounds/Dragon.ogg"
 		self.power = True
 	def poweron(self):
 		self.stats["Strength"] = self.stats["Strength"] * 10
@@ -392,6 +394,7 @@ class Monster(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "none"
+		self.sound = "Sound/Monster.ogg"
 		self.type = "Monster"
 
 # Populates master list of organisms to be used in the game; can be later sorted
