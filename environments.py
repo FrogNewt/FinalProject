@@ -7,37 +7,10 @@ import random
 #from gameclasses import popmain
 
 
-#poppop = popmain.popmaster
-
-#for org in poppop:
-#	print(org.truename, org.intername, org.meganame, org.type)
 
 
-def genorgs(env, player):
-	templist = []
-	pickedlist = []
-	newnum = 0
-	# You'll want to use "choice" here from the builtin random module; choose(sequence) will pick something randomly from a list
-	# This can be amended to operate within a range.
-	for org in player.popmaster:
-		if org.mobile == True:
-			templist.append(org)
-	for i in range(env.animalnum):
-		newchoice = random.choice(templist)
-		pickedlist.append(newchoice)
-			
-	return pickedlist
 
-def assignstats(env, player):
-	statorgs = []
-	for org in player.popmaster:
-		if org not in statorgs:
-			statorgs.append(org)
-			for stat in org.stats.keys():
-				org.stats[stat] = org.stats[stat] * (random.randint((env.difficulty-2 if (env.difficulty-2 > 0) else 1), env.difficulty))
-		if org.power:
-			org.poweron()
-	return statorgs
+
 
 
 
@@ -130,22 +103,5 @@ class darkForest(basicEnv):
 		self.animalnum = 40
 
 
-
-
-#startarea = startArea()
-
-#bog = Bog()
-
-#startorgs = genorgs(startarea, poppop)
-
-#bogorgs = genorgs(bog, poppop)
-
-#newlist = assignstats(startarea, startorgs)
-
-#biggerlist = assignstats(bog, bogorgs)
-
-#for x in biggerlist:
-#	for stat in x.stats.keys():
-#		print(x.name, x.type, (stat, x.stats[stat]))
 
 

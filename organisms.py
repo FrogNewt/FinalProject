@@ -5,7 +5,7 @@
 #import sys
 import re
 import random
-import pygame
+#import pygame
 #pygame.mixer.init()
 #import pickle
 
@@ -257,7 +257,7 @@ class Reptile(Organism):
 		self.therm = "ecto"
 		self.type = "Reptile"
 		self.power = True
-		self.sound = "Sounds/woodfrog.ogg"
+		self.sound = "Sounds/Reptile.ogg"
 	def poweron(self):
 		self.stats["Strength"] = self.stats["Strength"] * 2
 	def printdemo(self):
@@ -279,6 +279,8 @@ class Bird(Organism):
 		self.sound = "Sounds/Bird.ogg"
 		self.therm = "endo"
 		self.type = "Bird"
+	def poweron(self):
+		self.stats["Speed"] = self.stats["Speed"] * 2
 
 class Mammal(Organism):
 	def __init__(self):
@@ -290,6 +292,7 @@ class Mammal(Organism):
 		self.power = True
 	def poweron(self):
 		self.stats["HP"] = self.stats["HP"] * 5
+		self.stats["Max HP"] = self.stats["Max HP"] * 5
 
 class Fungus(Organism):
 	def __init__(self):
@@ -309,6 +312,7 @@ class Fish(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "none"
+		self.sound = "Sounds/Fish.ogg"
 		self.type = "Fish"
 
 class Insect(Organism):
@@ -394,8 +398,14 @@ class Monster(Organism):
 	def __init__(self):
 		super().__init__()
 		self.therm = "none"
-		self.sound = "Sound/Monster.ogg"
 		self.type = "Monster"
+		self.sound = "Sounds/Monster.ogg"
+
+class Pokemon(Organism):
+	def __init__(self):
+		super().__init__()
+		self.therm = "none"
+		self.type = "Pokemon"
 
 # Populates master list of organisms to be used in the game; can be later sorted
 def populatemaster(masterlist):
@@ -407,8 +417,7 @@ def populatemaster(masterlist):
 		organism.truename = organism.name
 		poptotal.append(organism)
 
-	#for organism in poptotal:
- 		#megacipher(organism)
+	
 
 
 	#[print(element.name) for element in popmaster]
@@ -449,23 +458,8 @@ def scrapetypes(poplist):
 					organism.type = line.split('\t')[5]
 	return poplist
 
-		# Note: Column 5 in Eukaryotes contains the "type" (Linnaean Class) of organism
-		#typeslist.append(line.split('\t')[5])
-		#org_line = line.strip()
-		#org_line = org_line.replace('[', '')
-		#org_line = org_line.replace(']', '')
-		#m = compiledclean.match(org_line)
-		# You could also use if !m: effectively
-		#if m is None:
-			#truemaster.add(org_line)
 
 
-### TURN BACK ON AFTER DEBUGGING ###
-#scrapetypes(popmaster)
-
-
-#for organism in popmaster:
-#	print(organism.truename, organism.type)
 
 
 ### DUMMY LIST TO BE USED IN DEBUGGING; CAN BE SUBSTITUTED FOR LARGER DATASET ###
@@ -513,7 +507,7 @@ def givetype(poplist):
 	"Kinetoplasts" : Kinetoplast,
 	"Other Animals" : Dragon,
 	"Other" : Monster,
-	"Organism" : Monster,
+	"Organism" : Pokemon,
 	"Basidiomycetes" : Basidiomycetes,
 	"Apicomplexans" : Apicomplexan,
 	"Flatworms" : Flatworm,
@@ -549,12 +543,6 @@ def givetype(poplist):
 
 	return holderlist
 
-### TURN BOTH BACK ON AFTER DEBUGGING ###
 
-# Actively generates game types for the organisms
-#popmaster = givetype(popmaster)
-
-# Actively shuffles ciphered names for all the organisms into place
-#popmaster = shuffleboth(popmaster)
 
 
